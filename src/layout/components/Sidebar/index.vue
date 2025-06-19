@@ -21,7 +21,7 @@ const handleClose = (key: string, keyPath: string[]) => {
       active-text-color="#ffd04b"
       background-color="#212c3d"
       class="el-menu-vertical-demo"
-      :default-active="activeMenu"
+      :default-active="'/'"
       text-color="#fff"
       style="border: none"
       :collapse="isCollapse"

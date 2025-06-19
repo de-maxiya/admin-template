@@ -1,31 +1,31 @@
 import Layout from '@/layout/index.vue'
+
 const routes = [
   {
     path: '/',
     name: 'all',
-    meta: { title: '', icon: 'home', allAccess: true },
+    meta: { title: '首页', icon: 'home', allAccess: true },
     component: Layout,
     children: [
       {
-        path: '/',
+        path: '', // 空路径，继承父路由的路径
         name: 'home',
-        meta: { title: '首页', icon: 'home', allAccess: true },
         component: () => import('@/views/home/index.vue'),
       },
     ],
   },
 
   {
-    path: '/shop',
-    name: 'shopList',
-    meta: { title: '', icon: 'home', allAccess: true },
+    path: '/data',
+    name: 'dataList',
+    meta: { title: '数据管理', icon: 'data' }, // 修正 title
     component: Layout,
     children: [
       {
-        path: '/shop',
-        name: 'shop',
-        meta: { title: '商品管理', icon: 'home', allAccess: true },
-        component: () => import('@/views/shop/index.vue'),
+        path: 'list', // 移除开头的斜杠，使用相对路径
+        name: 'list',
+        meta: { title: '数据列表', icon: 'list' },
+        component: () => import('@/views/list/index.vue'),
       },
     ],
   },
@@ -34,29 +34,21 @@ const routes = [
     path: '/login',
     name: 'login',
     component: () => import('@/views/login/index.vue'),
-    meta: {},
     hidden: true,
   },
+
+  {
+    path: '/:pathMatch(.*)*', // 通配符路由，捕获所有未匹配的路径
+    redirect: '/404',
+    hidden: true,
+  },
+
+  // 错误页面（可选，已通过通配符路由处理）
   {
     path: '/404',
     name: '404',
     component: () => import('@/views/errPage/404.vue'),
-    meta: {},
     hidden: true,
-  },
-  {
-    path: '/401',
-    name: 'error_401',
-    hidden: true,
-    meta: {},
-    component: () => import('@/views/errPage/401.vue'),
-  },
-  {
-    path: '/500',
-    name: 'error_500',
-    hidden: true,
-    meta: {},
-    component: () => import('@/views/errPage/500.vue'),
   },
 ]
 
