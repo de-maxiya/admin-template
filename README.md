@@ -1,8 +1,8 @@
 # admin-template
 
-This template should help get you started developing with Vue 3 in Vite.
 这就是一个后台模板，基于vue3+vite+ts+element-plus实现。
 就是想自己从头到尾，自己搭建一个后台admin项目的模板，包含登录路由
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
