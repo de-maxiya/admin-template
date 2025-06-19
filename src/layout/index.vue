@@ -16,6 +16,7 @@ import navbar from './components/Navbar.vue'
       src="https://picsum.photos/200/200"
       alt="用户头像"
       class="w-8 h-8 rounded-full object-cover"
+      style="width: 200px; height: 200px"
     /> -->
   </div>
 </template>
@@ -24,6 +25,5 @@ import navbar from './components/Navbar.vue'
 .all {
   width: 100%;
   height: 100%;
-  background-color: gray;
 }
 </style>
