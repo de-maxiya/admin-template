@@ -4,6 +4,8 @@
   <div class="navbar">
     <div class="leftTit">测试</div>
     <div class="rightTit">
+      <!-- https://e-assets.gitee.com/gitee-community-web/_next/static/media/mjc.a8f527c7.png?x-bce-process=image -->
+      <!-- https://picsum.photos/50/50 -->
       <img
         src="https://picsum.photos/50/50"
         alt="用户头像"
