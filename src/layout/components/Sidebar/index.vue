@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 // import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue'
 
 const isCollapse = ref(false)
@@ -9,6 +9,12 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+import routes from '@/router/routes'
+onMounted(() => {
+  console.log(routes)
+  const menuRoutes = routes.filter((item) => !item.hidden) // 为true不是菜单栏目的数据
+  console.log(menuRoutes)
+})
 </script>
 
 <template>

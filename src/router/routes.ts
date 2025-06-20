@@ -43,13 +43,13 @@ const routes = [
   },
   {
     path: '/user',
-    name: 'userList',
+    name: 'userListaLL',
     meta: { title: '用户管理', icon: 'data' }, // 修正 title
     component: Layout,
     children: [
       {
         path: 'list', // 移除开头的斜杠，使用相对路径
-        name: 'list',
+        name: 'userList',
         meta: { title: '用户列表', icon: 'list' },
         component: () => import('@/views/list/index.vue'),
       },
