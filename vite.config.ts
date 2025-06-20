@@ -22,11 +22,11 @@ export default defineConfig({
     open: true, // 自动打开浏览器
     proxy: {
       // 匹配 /api 开头请求
-      '/api': {
-        target: 'http://api.example.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // 重写路径，类似 Vue CLI 的 pathRewrite
-      },
+      // '/api': {
+      //   target: 'http://api.example.com',
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/api/, ''), // 重写路径，类似 Vue CLI 的 pathRewrite
+      // },
     },
   },
 })
