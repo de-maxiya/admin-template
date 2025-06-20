@@ -6,6 +6,7 @@ const routes = [
     name: 'all',
     meta: { title: '首页', icon: 'home', allAccess: true },
     component: Layout,
+    type: 'item', // 标识为菜单项
     children: [
       {
         path: '', // 空路径，继承父路由的路径
@@ -19,6 +20,7 @@ const routes = [
     path: '/data',
     name: 'dataList',
     meta: { title: '数据管理', icon: 'data' }, // 修正 title
+    type: 'submenu',
     component: Layout,
     children: [
       {
@@ -44,6 +46,7 @@ const routes = [
   {
     path: '/user',
     name: 'userListaLL',
+    type: 'submenu',
     meta: { title: '用户管理', icon: 'data' }, // 修正 title
     component: Layout,
     children: [
@@ -70,6 +73,7 @@ const routes = [
   {
     path: '/system',
     name: 'systemList',
+    type: 'submenu',
     meta: { title: '系统设置', icon: 'data' }, // 修正 title
     component: Layout,
     children: [
