@@ -48,7 +48,7 @@ onMounted(() => {
             <el-icon v-else :style="{ color: 'white' }">
               <component :is="item.icon" />
             </el-icon>
-            <span>{{ item.name }}</span>
+            <span>{{ item.meta.title }}</span>
           </template>
         </el-menu-item>
 
@@ -58,7 +58,7 @@ onMounted(() => {
             <el-icon :style="{ color: 'white' }">
               <i :class="item.icon"></i>
             </el-icon>
-            <span>{{ item.name }}</span>
+            <span>{{ item.meta.title }}</span>
           </template>
 
           <!-- 渲染子菜单项 -->
@@ -67,7 +67,10 @@ onMounted(() => {
             :key="child.path"
             :index="item.path + '/' + child.path"
           >
-            {{ child.name }}
+            <el-icon :style="{ color: 'white' }">
+              <i :class="item.icon"></i>
+            </el-icon>
+            <span> {{ child.meta.title }}</span>
           </el-menu-item>
         </el-sub-menu>
       </template>
