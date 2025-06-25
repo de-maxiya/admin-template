@@ -1,67 +1,41 @@
 <script setup lang="ts">
-import type { RouteLocationNormalized } from 'vue-router'
+import { routeStack } from './routers'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 // 修正类名：RouerStak -> RouteStack
-class RouteStack {
-  private stack: RouteLocationNormalized[] = []
 
-  add(route: RouteLocationNormalized) {
-    console.log('添加路由:', route.path, this.stack)
-
-    // 避免重复添加相同路由（如刷新页面或重复访问同一页面）
-    if (this.stack.length > 0 && this.stack[this.stack.length - 1].path === route.path) {
-      return
-    }
-
-    // 保留完整历史记录，不删除已存在的同一路由
-    this.stack.push(route)
-
-    // 限制最大长度，避免内存溢出
-    if (this.stack.length > 20) {
-      this.stack.shift()
-    }
-
-    console.log(
-      '当前路由栈:',
-      this.stack.map((item) => item.path),
-    )
-  }
-
-  jump(targetIndex: number) {
-    this.stack = this.stack.slice(0, targetIndex + 1)
-    console.log(
-      '跳转后栈:',
-      this.stack.map((item) => item.path),
-    )
-  }
-
-  getStack() {
-    return this.stack
-  }
-}
-
-const routeStack = new RouteStack()
 const router = useRouter()
 const route = useRoute()
 
 // 使用 ref 确保 currentIndex 响应式
 const currentIndex = ref(routeStack.getStack().length - 1)
-
+onMounted(() => {
+  routeStack.add({
+    path: route.path,
+    meta: route.meta,
+  })
+  currentIndex.value = routeStack.getStack().length - 1
+  console.log('初始化路由栈:', route.path)
+})
 watch(
   route,
-  (newRoute: RouteLocationNormalized) => {
+  (newRoute) => {
     console.log('路由变化:', newRoute.path, routeStack.getStack())
-    routeStack.add(newRoute)
+    routeStack.add({
+      path: newRoute.path,
+      meta: newRoute.meta,
+    })
     currentIndex.value = routeStack.getStack().length - 1
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 )
 
 const handleJump = (index: number) => {
-  router.push(routeStack.getStack()[index].path)
-  routeStack.jump(index)
+  console.log(index, '==213')
   currentIndex.value = index // 更新当前索引
+  routeStack.jump(index)
+
+  router.push(routeStack.getStack()[index].path)
 }
 </script>
 
