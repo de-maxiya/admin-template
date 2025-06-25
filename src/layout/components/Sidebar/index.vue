@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 // import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue'
-
+import { useRoute } from 'vue-router'
+import routes from '@/router/routes'
 const isCollapse = ref(false)
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -11,7 +12,10 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 
 const menuItems = ref<any[]>([])
-import routes from '@/router/routes'
+const route = useRoute()
+const activeMenu = () => {
+  return route.path
+}
 onMounted(() => {
   console.log(routes)
   menuItems.value = routes.filter((item) => !item.hidden) // 为true不是菜单栏目的数据
@@ -29,7 +33,7 @@ onMounted(() => {
       active-text-color="#ffd04b"
       background-color="#212c3d"
       class="el-menu-vertical-demo"
-      :default-active="'/'"
+      :default-active="activeMenu()"
       text-color="#fff"
       style="border: none"
       :collapse="isCollapse"

@@ -2,7 +2,14 @@
 
 <template>
   <div class="navbar">
-    <div class="leftTit">测试</div>
+    <div class="leftTit">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">homepage</el-breadcrumb-item>
+        <el-breadcrumb-item>
+          <a href="/">promotion management</a>
+        </el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
     <div class="rightTit">
       <!-- https://e-assets.gitee.com/gitee-community-web/_next/static/media/mjc.a8f527c7.png?x-bce-process=image -->
       <!-- https://picsum.photos/50/50 -->
