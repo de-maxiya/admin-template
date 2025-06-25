@@ -17,9 +17,7 @@ const activeMenu = () => {
   return route.path
 }
 onMounted(() => {
-  console.log(routes)
   menuItems.value = routes.filter((item) => !item.hidden) // 为true不是菜单栏目的数据
-  console.log(menuItems)
 })
 </script>
 

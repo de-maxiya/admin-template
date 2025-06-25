@@ -15,12 +15,10 @@ onMounted(() => {
     meta: route.meta,
   })
   currentIndex.value = routeStack.getStack().length - 1
-  console.log('初始化路由栈:', route.path)
 })
 watch(
   route,
   (newRoute) => {
-    console.log('路由变化:', newRoute.path, routeStack.getStack())
     routeStack.add({
       path: newRoute.path,
       meta: newRoute.meta,
@@ -33,7 +31,7 @@ watch(
 const handleJump = (index: number) => {
   console.log(index, '==213')
   currentIndex.value = index // 更新当前索引
-  routeStack.jump(index)
+  // routeStack.jump(index)
 
   router.push(routeStack.getStack()[index].path)
 }
@@ -45,12 +43,13 @@ const handleJump = (index: number) => {
       <div class="breadcrumb">
         <span
           v-for="(item, index) in routeStack.getStack()"
-          :key="item.path"
+          :key="index"
           @click="handleJump(index)"
           :class="{ active: index === currentIndex }"
         >
+          {{ index }} + {{ currentIndex }}
           {{ item.meta?.title || item.path }}
-          <span v-if="index < currentIndex"> / </span>
+          <!-- <span v-if="index < currentIndex"> / </span> -->
         </span>
       </div>
     </div>
@@ -89,10 +88,10 @@ const handleJump = (index: number) => {
 .breadcrumb span {
   cursor: pointer;
   margin-right: 5px;
-  color: #409eff;
+  color: #303133;
 }
 .breadcrumb span.active {
   font-weight: bold;
-  color: #303133;
+  color: blueviolet;
 }
 </style>
