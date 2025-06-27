@@ -20,14 +20,22 @@ onMounted(() => {
 watch(
   route,
   (newRoute) => {
-    if (routeAllList.value.some((it) => it.path === newRoute.path)) return
-    routeAllList.value.push({
-      path: newRoute.path,
-      meta: newRoute.meta,
-    })
-    currentIndex.value = routeAllList.value.length - 1
+    if (routeAllList.value.some((it) => it.path === newRoute.path)) {
+      const index = routeAllList.value.findIndex((it) => it.path === newRoute.path)
+
+      currentIndex.value = index
+    } else {
+      // 只有不存在，才会新增
+      routeAllList.value.push({
+        path: newRoute.path,
+        meta: newRoute.meta,
+      })
+      const index = routeAllList.value.findIndex((it) => it.path === newRoute.path)
+
+      currentIndex.value = index
+    }
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 )
 
 const handleJump = async (index: number) => {
