@@ -2,7 +2,11 @@
 import { routeStack } from './routers'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, watch, onMounted, nextTick } from 'vue'
+import { useBrandCrumbStore } from '@/stores/menu/navbar'
 // 修正类名：RouerStak -> RouteStack
+const counter = useBrandCrumbStore()
+
+console.log(counter, '==copunter')
 
 const router = useRouter()
 const route = useRoute()
@@ -14,6 +18,7 @@ onMounted(() => {
     path: route.path,
     meta: route.meta,
   })
+  counter.increment(routeStack.getStack().length - 1)
   currentIndex.value = routeStack.getStack().length - 1
 })
 watch(
@@ -23,6 +28,7 @@ watch(
       path: newRoute.path,
       meta: newRoute.meta,
     })
+    counter.increment(routeStack.getStack().length - 1)
     currentIndex.value = routeStack.getStack().length - 1
   },
   { immediate: true, deep: true },
@@ -33,7 +39,7 @@ const handleJump = async (index: number) => {
   currentIndex.value = index // 更新当前索引
   // routeStack.jump(index)
   await nextTick()
-
+  counter.increment(index)
   router.push(routeStack.getStack()[index].path)
 }
 </script>
@@ -41,18 +47,17 @@ const handleJump = async (index: number) => {
 <template>
   <div class="navbar">
     <div class="leftTit">
-      {{ currentIndex }}
-      <!-- <div class="breadcrumb">
+      <div class="breadcrumb">
         <span
           v-for="(item, index) in routeStack.getStack()"
           :key="index"
           @click="handleJump(index)"
-          :class="{ active: index === currentIndex }"
+          :class="{ active: index === counter.count }"
         >
-          {{ index }} + {{ currentIndex }}
+          {{ index }} + {{ counter.count }}
           {{ item.meta?.title || item.path }}
         </span>
-      </div> -->
+      </div>
     </div>
     <div class="rightTit">
       <img
