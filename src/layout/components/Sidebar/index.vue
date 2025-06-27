@@ -19,6 +19,10 @@ const activeMenu = () => {
 onMounted(() => {
   menuItems.value = routes.filter((item) => !item.hidden) // 为true不是菜单栏目的数据
 })
+
+const handleClick = (key: string) => {
+  console.log(key, route)
+}
 </script>
 
 <template>
@@ -38,6 +42,7 @@ onMounted(() => {
       router
       @open="handleOpen"
       @close="handleClose"
+      @click="handleClick"
     >
       <!-- 动态渲染菜单项 -->
       <template v-for="item in menuItems" :key="item.path || item.index">

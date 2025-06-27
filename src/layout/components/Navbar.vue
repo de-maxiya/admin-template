@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { routeStack } from './routers'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 // 修正类名：RouerStak -> RouteStack
 
 const router = useRouter()
@@ -28,10 +28,11 @@ watch(
   { immediate: true, deep: true },
 )
 
-const handleJump = (index: number) => {
+const handleJump = async (index: number) => {
   console.log(index, '==213')
   currentIndex.value = index // 更新当前索引
   // routeStack.jump(index)
+  await nextTick()
 
   router.push(routeStack.getStack()[index].path)
 }
@@ -40,7 +41,8 @@ const handleJump = (index: number) => {
 <template>
   <div class="navbar">
     <div class="leftTit">
-      <div class="breadcrumb">
+      {{ currentIndex }}
+      <!-- <div class="breadcrumb">
         <span
           v-for="(item, index) in routeStack.getStack()"
           :key="index"
@@ -49,9 +51,8 @@ const handleJump = (index: number) => {
         >
           {{ index }} + {{ currentIndex }}
           {{ item.meta?.title || item.path }}
-          <!-- <span v-if="index < currentIndex"> / </span> -->
         </span>
-      </div>
+      </div> -->
     </div>
     <div class="rightTit">
       <img

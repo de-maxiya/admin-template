@@ -27,19 +27,19 @@ const routes = [
         path: 'list', // 移除开头的斜杠，使用相对路径
         name: 'list',
         meta: { title: '数据列表', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
       {
         path: 'import', // 移除开头的斜杠，使用相对路径
         name: 'import',
         meta: { title: '数据导入', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/import/index.vue'),
       },
       {
         path: 'export', // 移除开头的斜杠，使用相对路径
         name: 'export',
         meta: { title: '数据导出', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
     ],
   },
@@ -54,19 +54,19 @@ const routes = [
         path: 'list', // 移除开头的斜杠，使用相对路径
         name: 'userList',
         meta: { title: '用户列表', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
       {
         path: 'role', // 移除开头的斜杠，使用相对路径
         name: 'role',
         meta: { title: '角色管理', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
       {
         path: 'permission', // 移除开头的斜杠，使用相对路径
         name: 'permission',
         meta: { title: '权限配置', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
     ],
   },
@@ -81,19 +81,19 @@ const routes = [
         path: 'settings', // 移除开头的斜杠，使用相对路径
         name: 'settings',
         meta: { title: '基本设置', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
       {
         path: 'logs', // 移除开头的斜杠，使用相对路径
         name: 'logs',
         meta: { title: '操作日志', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
       {
         path: 'backup', // 移除开头的斜杠，使用相对路径
         name: 'backup',
         meta: { title: '数据备份', icon: 'list' },
-        component: () => import('@/views/list/index.vue'),
+        component: () => import('@/views/dataList/list/index.vue'),
       },
     ],
   },
