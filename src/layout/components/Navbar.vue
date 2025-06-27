@@ -25,6 +25,9 @@ watch(
 
       currentIndex.value = index
     } else {
+      if (newRoute.path === '/login') return
+      // 如果满足10条，删除第一条数据
+      if (routeAllList.value.length === 10) routeAllList.value.shift()
       // 只有不存在，才会新增
       routeAllList.value.push({
         path: newRoute.path,
