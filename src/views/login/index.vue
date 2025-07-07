@@ -4,8 +4,8 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '@/stores/login'
 const loginForm = ref({
-  account: '',
-  password: '',
+  account: 'admin',
+  password: '123456',
 })
 
 const loginStore = useLoginStore()
