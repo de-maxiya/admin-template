@@ -2,10 +2,13 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useLoginStore } from '@/stores/login'
 const loginForm = ref({
   account: '',
   password: '',
 })
+
+const loginStore = useLoginStore()
 
 const router = useRouter()
 const handleLogin = () => {
@@ -19,6 +22,7 @@ const handleLogin = () => {
   }
   if (loginForm.value.account === 'admin' && loginForm.value.password === '123456') {
     ElMessage.success('登录成功')
+    loginStore.increment(true)
     router.push({ name: 'home' })
   } else {
     ElMessage.error('账号或密码错误')

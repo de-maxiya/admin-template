@@ -1,18 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { nextTick } from 'vue'
 import routes from './routes'
+import { useLoginStore } from '@/stores/login'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+// 全局前置守卫
+router.beforeEach((to, from) => {
+  const loginStore = useLoginStore()
+
   // if (to.meta.title) {
-  //   document.title = to.meta.title as string
+  //   document.title = to.meta.title
   // }
-  nextTick(() => {
-    next()
-  })
+
+  if (!loginStore.count && to.name !== 'login') {
+    return { name: 'login' }
+  }
+
+  if (loginStore.count && to.name === 'login') {
+    return { name: 'home' }
+  }
+  return true
 })
 
 export default router
