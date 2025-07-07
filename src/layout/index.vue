@@ -7,9 +7,14 @@ import navbar from './components/Navbar.vue'
   <div class="all" style="display: flex">
     <sidebar />
 
-    <navbar />
-    <div style="position: absolute; margin-left: 240px; margin-top: 60px">
-      <router-view />
+    <!-- 需要使用relative ，会自动占据剩下的宽度 ，如果使用absolute ，则不会自动占据剩下的宽度，还需要手动 减去左侧菜单栏的240像素 -->
+    <div style="position: relative; width: 100%">
+      <navbar />
+
+      <div style="padding: 20px">
+        <!-- 给每一个页面新增 20pd间距，防止贴边展示 -->
+        <router-view />
+      </div>
     </div>
 
     <!-- <img
