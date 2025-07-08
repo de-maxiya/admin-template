@@ -26,13 +26,13 @@ const routes = [
       {
         path: 'list', // 移除开头的斜杠，使用相对路径
         name: 'list',
-        meta: { title: '数据列表', icon: 'list' },
+        meta: { title: '计算退休', icon: 'list' },
         component: () => import('@/views/dataList/list/index.vue'),
       },
       {
         path: 'import', // 移除开头的斜杠，使用相对路径
         name: 'import',
-        meta: { title: '数据导入', icon: 'list' },
+        meta: { title: '计算gdp增速', icon: 'list' },
         component: () => import('@/views/dataList/import/index.vue'),
       },
       {
