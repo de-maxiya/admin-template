@@ -93,7 +93,7 @@ body {
     .login {
       width: 500px;
       height: 300px;
-      background-color: rgb(110, 122, 110, 0.2);
+      background-color: rgb(110, 122, 110, 0.1);
       // opacity: 0.2;
       border-radius: 20px;
       position: absolute;

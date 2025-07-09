@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
-// 修正类名：RouerStak -> RouteStack
+import { useLoginStore } from '@/stores/login'
+const loginStore = useLoginStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -64,6 +65,36 @@ const handleJump = async (index: number) => {
         class="w-8 h-8 rounded-full object-cover"
         style="width: 50px; height: 50px"
       />
+
+      <div>
+        <el-dropdown>
+          <span class="el-dropdown-link">
+            操作
+            <el-icon class="el-icon--right">
+              <arrow-down />
+            </el-icon>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>
+                <router-link :to="{ name: 'home' }" style="text-decoration: none; color: #7a6966">
+                  首页</router-link
+                >
+              </el-dropdown-item>
+              <el-dropdown-item>信息</el-dropdown-item>
+              <el-dropdown-item>
+                <router-link
+                  :to="{ name: 'login' }"
+                  type="text"
+                  @click="loginStore.close()"
+                  style="text-decoration: none; color: #7a6966"
+                  >退出</router-link
+                >
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </div>
   </div>
 </template>
@@ -79,8 +110,10 @@ const handleJump = async (index: number) => {
   align-items: center;
   padding: 0 20px;
   .rightTit {
-    // border-radius: 25px;
-    // overflow: hidden;
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    align-items: center;
+    gap: 20px;
   }
 }
 

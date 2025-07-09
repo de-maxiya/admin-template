@@ -10,5 +10,8 @@ export const useLoginStore = defineStore('counter', {
     increment(val: boolean) {
       this.count = val
     },
+    close() {
+      this.count = false
+    },
   },
 })
