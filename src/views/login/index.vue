@@ -80,6 +80,7 @@ body {
   /* 移除滚动相关设置 */
   overflow: hidden;
   scroll-snap-type: none;
+  // blob:https://cn.bing.com/c03f5afe-5fa9-43f7-a638-bbbaf44957ae
   .loginbgc {
     width: 100%;
     height: 100%;

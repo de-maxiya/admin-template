@@ -81,7 +81,7 @@ const handleJump = async (index: number) => {
                   首页</router-link
                 >
               </el-dropdown-item>
-              <el-dropdown-item>信息</el-dropdown-item>
+              <!-- <el-dropdown-item>信息</el-dropdown-item> -->
               <el-dropdown-item>
                 <router-link
                   :to="{ name: 'login' }"
