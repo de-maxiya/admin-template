@@ -45,7 +45,7 @@ const routes = [
   },
   {
     path: '/user',
-    name: 'userListaLL',
+    name: 'userAll',
     type: 'submenu',
     meta: { title: '用户管理', icon: 'data' }, // 修正 title
     component: Layout,
@@ -54,7 +54,7 @@ const routes = [
         path: 'list', // 移除开头的斜杠，使用相对路径
         name: 'userList',
         meta: { title: '用户列表', icon: 'list' },
-        component: () => import('@/views/dataList/list/index.vue'),
+        component: () => import('@/views/userAll/user/index.vue'),
       },
       {
         path: 'role', // 移除开头的斜杠，使用相对路径
