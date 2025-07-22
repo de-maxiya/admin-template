@@ -23,6 +23,7 @@
 
       <el-button type="primary" @click="handleGetList">获取数据</el-button>
 
+      <!-- <img src="blob:orpheus://orpheus/83b2d0be-44cb-4ebd-9b02-2ad4ba958aca" alt="" /> -->
       <span v-if="resValue">
         {{ resValue }}
       </span>
@@ -42,6 +43,17 @@ const formLabelAlign = reactive({
   Gear: '',
   year: '',
 })
+// const blobUrl = 'blob:orpheus://orpheus/63aaf9d1-571b-4c0e-b951-8e584834ff14'
+// fetch(blobUrl)
+//   .then((response) => response.blob())
+//   .then((blob) => {
+//     const imageUrl = URL.createObjectURL(blob)
+//     const img = document.createElement('img')
+//     img.src = imageUrl
+//     img.style.maxWidth = '100%'
+//     img.style.maxHeight = '100%'
+//     document.body.appendChild(img)
+//   })
 const resValue = ref(0)
 const handleCalculate = () => {
   const { Salary, Gear, year } = formLabelAlign
@@ -62,7 +74,7 @@ const handleCalculate = () => {
 const handleGetList = async () => {
   await axios({
     method: 'GET',
-    url: '/api/users',
+    url: '/admin/api/user',
   }).then((res) => {
     console.log(res.data, '21312')
   })

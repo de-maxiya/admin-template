@@ -60,7 +60,7 @@ const routes = [
         path: 'role', // 移除开头的斜杠，使用相对路径
         name: 'role',
         meta: { title: '角色管理', icon: 'list' },
-        component: () => import('@/views/dataList/list/index.vue'),
+        component: () => import('@/views/userAll/role/index.vue'),
       },
       {
         path: 'permission', // 移除开头的斜杠，使用相对路径
