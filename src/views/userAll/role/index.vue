@@ -4,9 +4,20 @@
   <el-table :data="tableData" style="width: 100%">
     <el-table-column prop="id" label="ID" width="180" />
     <el-table-column prop="name" label="用户名称" width="180" />
+    <el-table-column prop="age" label="用户年龄" width="180" />
+    <el-table-column prop="status" label="用户状态" width="180" />
+    <el-table-column prop="gender" label="用户性别" width="180" />
     <el-table-column prop="img" label="用户头像">
       <template #default="scope">
         <el-image style="width: 100px; height: 100px" :src="scope.row.img"></el-image>
+      </template>
+    </el-table-column>
+
+    <el-table-column prop="" label="操作">
+      <template #default="scope">
+        <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+
+        <el-button type="text" @click="handleDelete(scope.row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -17,13 +28,17 @@
         <el-input v-model="formall.name" placeholder="请输入名称"></el-input>
       </el-form-item>
       <el-form-item label="年龄">
-        <el-input v-model="formall.age" placeholder="请输入名称"></el-input>
+        <el-input v-model="formall.age" placeholder="请输入年龄"></el-input>
       </el-form-item>
       <el-form-item label="状态">
-        <el-input v-model="formall.status" placeholder="请输入名称"></el-input>
+        <el-input v-model="formall.status" placeholder="请输入状态"></el-input>
       </el-form-item>
       <el-form-item label="性别">
-        <el-input v-model="formall.gender" placeholder="请输入名称"></el-input>
+        <el-input v-model="formall.gender" placeholder="请输入性别"></el-input>
+      </el-form-item>
+
+      <el-form-item label="图片地址">
+        <el-input v-model="formall.img" placeholder="请输入图片地址"></el-input>
       </el-form-item>
     </el-form>
 
@@ -46,6 +61,7 @@ let formall = reactive({
   age: '',
   status: '',
   gender: '',
+  img: '',
 })
 
 onMounted(async () => {
@@ -65,6 +81,7 @@ const handleClose = () => {
     age: '',
     status: '',
     gender: '',
+    img: '',
   }
   dialogVisible.value = false
 }
@@ -73,14 +90,13 @@ const handleClose = () => {
 // http://p3.music.126.net/e85aIwIu-ePI5xBO_C90DA==/109951171393072843.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
 
 const handleAddRole = () => {
-  console.log('新增')
   axios
     .post('/admin/api/user', {
-      name: '666',
-      age: '111',
-      status: '1',
-      gender: '1',
-      img: 'http://p3.music.126.net/e85aIwIu-ePI5xBO_C90DA==/109951171393072843.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0',
+      name: formall.name,
+      age: formall.age,
+      status: formall.status,
+      gender: formall.gender,
+      img: formall.img,
     })
     .then((res) => {
       if (res.data.code === 200) {
@@ -91,6 +107,31 @@ const handleAddRole = () => {
         getList()
       }
     })
+}
+
+interface RowType {
+  id: number
+  name: string
+  age: string
+  status: string
+  gender: string
+  img: string
+}
+const handleEdit = (row: RowType) => {
+  dialogVisible.value = true
+  formall = row
+}
+
+const handleDelete = (row: RowType) => {
+  axios.delete(`/admin/api/user/${row.id}`).then((res) => {
+    if (res.data.code === 200) {
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+      })
+      getList()
+    }
+  })
 }
 </script>
 
