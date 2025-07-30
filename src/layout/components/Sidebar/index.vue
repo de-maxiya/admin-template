@@ -87,6 +87,9 @@ const handleClick = (key: string) => {
 
 <style scoped>
 .sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
   width: 240px;
   height: 100vh;
   max-height: 100vh;

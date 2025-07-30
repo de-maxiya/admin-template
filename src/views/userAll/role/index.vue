@@ -15,9 +15,9 @@
 
     <el-table-column prop="" label="操作">
       <template #default="scope">
-        <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+        <el-button link :type="'primary'" @click="handleEdit(scope.row)">编辑</el-button>
 
-        <el-button type="text" @click="handleDelete(scope.row)">删除</el-button>
+        <el-button link :type="'danger'" @click="handleDelete(scope.row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -149,13 +149,15 @@ const handleAddRole = () => {
       img: formall.img,
     })
     .then(async (res) => {
+      console.log(res, '===231`312')
+
       if (res.data.code === 200) {
+        dialogVisible.value = false
         ElMessage({
           message: '新增成功',
           type: 'success',
         })
         await getList()
-        dialogVisible.value = false
       }
     })
 }

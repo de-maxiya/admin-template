@@ -8,7 +8,7 @@ import navbar from './components/Navbar.vue'
     <sidebar />
 
     <!-- 需要使用relative ，会自动占据剩下的宽度 ，如果使用absolute ，则不会自动占据剩下的宽度，还需要手动 减去左侧菜单栏的240像素 -->
-    <div style="position: relative; width: 100%">
+    <div style="position: relative; width: 100%; margin-left: 240px">
       <navbar />
 
       <div style="padding: 20px">
@@ -29,6 +29,6 @@ import navbar from './components/Navbar.vue'
 <style scoped>
 .all {
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 </style>
