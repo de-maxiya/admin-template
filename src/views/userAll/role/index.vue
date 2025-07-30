@@ -71,7 +71,7 @@
 <script lang="ts" setup>
 import axios from 'axios'
 import { ref, onMounted, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 const tableData = ref([])
 const dialogVisible = ref(false)
 let formall = reactive({
@@ -178,15 +178,28 @@ const handleEdit = (row: RowType) => {
 }
 
 const handleDelete = (row: RowType) => {
-  axios.delete(`/admin/api/user/${row.id}`).then((res) => {
-    if (res.data.code === 200) {
-      ElMessage({
-        message: '删除成功',
-        type: 'success',
-      })
-      getList()
-    }
+  ElMessageBox.confirm('确认删除吗？', 'Warning', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
   })
+    .then(() => {
+      axios.delete(`/admin/api/user/${row.id}`).then((res) => {
+        if (res.data.code === 200) {
+          ElMessage({
+            message: '删除成功',
+            type: 'success',
+          })
+          getList()
+        }
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
 }
 </script>
 
