@@ -1,7 +1,7 @@
 <template>
   <el-button type="primary" @click="dialogVisible = true">新增</el-button>
   <el-button type="primary" @click="getList()">搜索</el-button>
-  <el-table :data="tableData" style="width: 100%">
+  <el-table v-loading="loading" :data="tableData" style="width: 100%">
     <el-table-column prop="id" label="ID" width="180" />
     <el-table-column prop="name" label="用户名称" width="180" />
     <el-table-column prop="age" label="用户年龄" width="180" />
@@ -31,10 +31,26 @@
         <el-input v-model="formall.age" placeholder="请输入年龄"></el-input>
       </el-form-item>
       <el-form-item label="状态">
-        <el-input v-model="formall.status" placeholder="请输入状态"></el-input>
+        <el-select v-model="formall.status" placeholder="请选择状态">
+          <el-option
+            v-for="item in statusOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="性别">
-        <el-input v-model="formall.gender" placeholder="请输入性别"></el-input>
+        <el-select v-model="formall.gender" placeholder="请选择性别">
+          <el-option
+            v-for="item in genderOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
 
       <el-form-item label="图片地址">
@@ -65,26 +81,57 @@ let formall = reactive({
   gender: '',
   img: '',
 })
+const statusOptions = [
+  {
+    label: '正常',
+    value: '1',
+  },
+  {
+    label: '已经注册',
+    value: '2',
+  },
+  {
+    label: '未注册',
+    value: '3',
+  },
+  {
+    label: '禁用',
+    value: '0',
+  },
+]
+const genderOptions = [
+  {
+    label: '男',
+    value: '男',
+  },
+  {
+    label: '女',
+    value: '女',
+  },
+]
 
 onMounted(async () => {
   await getList()
 })
 
 const getList = async () => {
+  loading.value = true
   await axios.get('/admin/api/user').then((res) => {
     tableData.value = res.data.data
-    console.log(res, '==321')
+    loading.value = false
   })
 }
 
+const loading = ref(false)
+
 const handleClose = () => {
-  formall = {
+  Object.assign(formall, {
     name: '',
     age: '',
     status: '',
     gender: '',
     img: '',
-  }
+  })
   dialogVisible.value = false
   isEdit.value = false
 }
@@ -101,13 +148,14 @@ const handleAddRole = () => {
       gender: formall.gender,
       img: formall.img,
     })
-    .then((res) => {
+    .then(async (res) => {
       if (res.data.code === 200) {
         ElMessage({
           message: '新增成功',
           type: 'success',
         })
-        getList()
+        await getList()
+        dialogVisible.value = false
       }
     })
 }
