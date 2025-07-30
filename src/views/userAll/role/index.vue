@@ -44,8 +44,10 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleAddRole"> 新增 </el-button>
+        <el-button @click="handleClose">取消</el-button>
+        <el-button type="primary" @click="handleAddRole">
+          {{ isEdit ? '编辑' : '新增' }}
+        </el-button>
       </div>
     </template>
   </el-dialog>
@@ -84,6 +86,7 @@ const handleClose = () => {
     img: '',
   }
   dialogVisible.value = false
+  isEdit.value = false
 }
 // 'http://p3.music.126.net/T-pj5y9uahizQ6UhUygYdg==/109951171457557274.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0'
 // https://p1.music.126.net/n_GTguQS1xx9W81K-uoxww==/109951170687031355.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
@@ -117,7 +120,9 @@ interface RowType {
   gender: string
   img: string
 }
+const isEdit = ref(false)
 const handleEdit = (row: RowType) => {
+  isEdit.value = true
   dialogVisible.value = true
   formall = row
 }
