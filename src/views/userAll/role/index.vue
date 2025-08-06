@@ -53,6 +53,22 @@
     </el-table-column>
   </el-table>
 
+  <!--
+  https://p1.music.126.net/KkmOZTtSD9Cse5Cwf_9L3A==/109951170020022216.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
+  -->
+  <el-pagination
+    v-model:current-page="currentPage4"
+    v-model:page-size="pageSize4"
+    :page-sizes="[100, 200, 300, 400]"
+    :size="size"
+    :disabled="disabled"
+    :background="background"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="400"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+  />
+
   <el-dialog v-model="dialogVisible" title="新增" width="30%" :before-close="handleClose">
     <el-form ref="form" :model="formall" label-width="80px" label-position="top">
       <el-form-item label="名称">
@@ -102,7 +118,21 @@
 <script lang="ts" setup>
 import axios from 'axios'
 import { ref, onMounted, reactive } from 'vue'
+import type { ComponentSize } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
+const currentPage4 = ref(4)
+const pageSize4 = ref(100)
+const size = ref<ComponentSize>('default')
+const background = ref(false)
+const disabled = ref(false)
+
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val: number) => {
+  console.log(`current page: ${val}`)
+}
+
 const tableData = ref([])
 const dialogVisible = ref(false)
 const formSearch = reactive({
