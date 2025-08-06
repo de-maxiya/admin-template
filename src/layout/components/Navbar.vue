@@ -6,15 +6,20 @@ const loginStore = useLoginStore()
 
 const route = useRoute()
 const router = useRouter()
-const routeAllList = ref<{ path: string; meta: object }[]>([])
+interface ObjMate {
+  title: string
+  icon: string
+}
+const routeAllList = ref<{ path: string; meta: ObjMate }[]>([])
 
 // 使用 ref 确保 currentIndex 响应式
 const currentIndex = ref(0)
 onMounted(() => {
   if (routeAllList.value.some((it) => it.path === route.path)) return
+  const meta = route.meta as unknown as ObjMate
   routeAllList.value.push({
     path: route.path,
-    meta: route.meta,
+    meta,
   })
   currentIndex.value = routeAllList.value.length - 1
 })
@@ -30,9 +35,10 @@ watch(
       // 如果满足10条，删除第一条数据
       if (routeAllList.value.length === 10) routeAllList.value.shift()
       // 只有不存在，才会新增
+      const meta = newRoute.meta as unknown as ObjMate
       routeAllList.value.push({
         path: newRoute.path,
-        meta: newRoute.meta,
+        meta,
       })
       const index = routeAllList.value.findIndex((it) => it.path === newRoute.path)
 
@@ -54,7 +60,7 @@ const handleJump = async (index: number) => {
     <div class="leftTit">
       <div v-for="(item, index) in routeAllList" :key="index" class="breadcrumb">
         <span @click="handleJump(index)" :class="{ active: index === currentIndex }">
-          {{ item.meta?.title || item.path }}
+          {{ item.meta.title }}
         </span>
       </div>
     </div>
