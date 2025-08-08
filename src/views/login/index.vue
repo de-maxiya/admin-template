@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '@/stores/login'
-
+import { User, Lock } from '@element-plus/icons-vue'
 const loginForm = ref({
   account: 'admin',
   password: '123456',
