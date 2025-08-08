@@ -3,15 +3,14 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '@/stores/login'
-
 const loginForm = ref({
   account: 'admin',
   password: '123456',
 })
 
 const loginStore = useLoginStore()
-const router = useRouter()
 
+const router = useRouter()
 const handleLogin = () => {
   if (!loginForm.value.account) {
     ElMessage.error('请输入账号')
@@ -34,29 +33,14 @@ const handleLogin = () => {
 <template>
   <div class="loginbgc-container">
     <div class="loginbgc">
-      <!-- 视频背景元素 -->
-      <video
-        class="bg-video"
-        autoplay
-        muted
-        loop
-        playsinline
-        poster="https://picsum.photos/1920/1080?blur=2"
-      >
-        <source
-          src="https://sxcontent9668.azureedge.us/cms-assets/assets/Mars_Rotation_Web_HB_d96299f9de.mp4"
-          type="video/mp4"
-        />
-        <!-- 视频无法加载时显示的替代内容 -->
-        <div class="fallback-bg"></div>
-      </video>
-
-      <!-- 渐变遮罩层 -->
-      <div class="bg-overlay"></div>
-
-      <!-- 登录表单 -->
       <div class="login">
-        <el-form :model="loginForm" label-width="80px" label-position="top" style="padding: 20px">
+        <el-form
+          ref="form"
+          :model="loginForm"
+          label-width="80px"
+          label-position="top"
+          style="padding: 20px"
+        >
           <el-form-item label="账号">
             <template #label>
               <span style="color: #000">账号</span>
@@ -86,84 +70,48 @@ const handleLogin = () => {
 <style scoped lang="scss">
 /* 核心：禁用整个页面的滚动并隐藏滚动条 */
 body {
-  overflow: hidden;
-  margin: 0;
+  overflow: hidden; /* 禁用页面滚动 */
+  margin: 0; /* 清除默认边距 */
 }
+// https://sxcontent9668.azureedge.us/cms-assets/assets/Mars_Rotation_Web_HB_d96299f9de.mp4
 
 .loginbgc-container {
   width: 100vw;
   height: 100vh;
+  /* 移除滚动相关设置 */
   overflow: hidden;
-  position: relative;
-
+  scroll-snap-type: none;
+  // blob:https://cn.bing.com/c03f5afe-5fa9-43f7-a638-bbbaf44957ae
   .loginbgc {
     width: 100%;
     height: 100%;
-    position: relative;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
+      url('https://ecreps.bellacocool.com/d7527c28-8238-4207-8161-42aa5062ebbd.webp') center/cover
+        no-repeat fixed;
+
     animation: breathe 15s ease-in-out infinite;
-
-    // 视频背景样式
-    .bg-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
-
-    // 视频加载失败时的备用背景
-    .fallback-bg {
-      width: 100%;
-      height: 100%;
-      background: url('https://ecreps.bellacocool.com/d7527c28-8238-4207-8161-42aa5062ebbd.webp')
-        center/cover no-repeat;
-    }
-
-    // 渐变遮罩层
-    .bg-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
-      z-index: 1;
-    }
-
-    // 登录框样式
+    position: relative;
     .login {
       width: 500px;
-      max-width: 90vw; // 适配移动端
       height: 300px;
-      background-color: rgba(255, 255, 255, 0.8); // 半透明白色背景，提高表单可读性
-      backdrop-filter: blur(10px); // 毛玻璃效果
+      background-color: rgb(110, 122, 110, 0.1);
+      // opacity: 0.2;
       border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); // 增加阴影，提升层次感
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      z-index: 2;
-      transition: all 0.3s ease;
-
-      // 鼠标悬停效果
-      &:hover {
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-      }
     }
   }
 }
-
-// 登录按钮容器
 .btnFootr {
+  // width: 60px;
+  // margin: 0 auto;
   display: flex;
   justify-content: center;
-  margin-top: 20px;
 }
 
-// 呼吸动画
 @keyframes breathe {
   0%,
   100% {
@@ -174,11 +122,10 @@ body {
   }
 }
 
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .login {
-    height: auto !important;
-    padding: 20px !important;
+/* 额外：确保移动端也禁用滚动 */
+@media (pointer: coarse) {
+  body {
+    touch-action: none; /* 禁用触摸滚动 */
   }
 }
 </style>

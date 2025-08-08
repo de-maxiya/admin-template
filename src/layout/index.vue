@@ -25,7 +25,7 @@ import navbar from './components/Navbar.vue'
     /> -->
   </div>
 </template>
-
+<!-- https://sxcontent9668.azureedge.us/cms-assets/assets/Mars_Rotation_Web_HB_d96299f9de.mp4 -->
 <style scoped>
 .all {
   width: 100%;
