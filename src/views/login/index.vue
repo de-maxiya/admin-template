@@ -44,7 +44,7 @@ const handleLogin = async () => {
 
     // 模拟登录校验（实际需调用后端接口）
     if (
-      loginForm.value.account === 'licong' &&
+      loginForm.value.account === 'lsj' &&
       loginForm.value.password === '123456' &&
       loginForm.value.captcha === 'EJE2' // 示例验证码，实际需后端校验
     ) {
@@ -91,7 +91,12 @@ const handleOfflineLogin = () => {
 
       <div class="login">
         <div class="login-title">
-          <h2>系统登录</h2>
+          <img
+            src="https://p1.music.126.net/XmmQY9RuWF1RY-Z3QmA9Sg==/109951165545584764.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0"
+            style="width: 100px; height: 100px"
+            alt=""
+          />
+          <!-- <h2>系统登录</h2> -->
           <p class="subtitle">欢迎回来，请登录您的账号</p>
         </div>
 
