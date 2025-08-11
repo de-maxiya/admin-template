@@ -46,7 +46,7 @@ const handleLogin = async () => {
     if (
       loginForm.value.account === 'lsj' &&
       loginForm.value.password === '123456' &&
-      loginForm.value.captcha === 'EJE2' // 示例验证码，实际需后端校验
+      loginForm.value.captcha === '1111' // 示例验证码，实际需后端校验
     ) {
       ElMessage.success('登录成功，正在进入系统...')
       loginStore.increment(true)
