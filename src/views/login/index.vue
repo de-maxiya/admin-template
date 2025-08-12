@@ -21,8 +21,8 @@ const cryptoData = reactive({
 
 // 登录表单数据
 const loginForm = ref({
-  account: 'lsj',
-  password: '123456',
+  account: '',
+  password: '',
   captcha: '',
   remember: false,
 })
@@ -264,6 +264,8 @@ const handleLogin = async () => {
       }
 
       setTimeout(() => {
+        console.log('登录成功')
+
         router.push({ name: 'home' })
       }, 1000)
     } else {
@@ -290,6 +292,152 @@ const handleOfflineLogin = () => {
 const createDialog = ref(false)
 const handleOpenCreate = () => {
   createDialog.value = true
+
+  loginForm.value.account = ''
+  loginForm.value.password = ''
+  loginForm.value.captcha = ''
+}
+
+// 注册处理函数（完整逻辑，复用Web Crypto API）
+const handleCreate = async () => {
+  // 1. 基础表单验证
+  if (!loginForm.value.account) {
+    ElMessage.error('请输入账号')
+    return
+  }
+  if (!loginForm.value.password) {
+    ElMessage.error('请输入密码')
+    return
+  }
+
+  try {
+    // 2. 完成ECDH密钥交换（复用登录的Web Crypto API逻辑）
+    const { sharedSecret: regSharedSecret, iv: regIv } = await initECDHExchangeWithWebCrypto()
+    // 3. 用共享密钥加密密码（AES-256-CBC，与登录加密逻辑一致）
+    const encryptedPassword = await encryptDataWithKey(
+      loginForm.value.password,
+      regIv,
+      regSharedSecret,
+    )
+
+    // 4. 发送注册请求
+    const res = await axios.post('/admin/api/auth/create', {
+      account: loginForm.value.account,
+      name: loginForm.value.name || loginForm.value.account, // 可选用户名
+      encryptedPassword: encryptedPassword,
+      iv: regIv, // 加密向量（转为16进制字符串）
+    })
+
+    // 5. 处理注册结果
+    if (res.code === 200) {
+      ElMessage.success('注册成功')
+      createDialog.value = false
+      loginForm.value = { account: '', password: '', captcha: '', remember: false }
+      // 1. 获取服务器公钥
+      await getServerPublicKey()
+      // 2. 生成客户端密钥对并交换
+      await generateClientKeyPair()
+      await exchangePublicKey()
+      // 3. 获取验证码
+      await getCaptcha()
+    }
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : '注册失败，请重试')
+    console.error('注册错误:', error)
+  }
+}
+// 新增：带密钥参数的加密函数（避免依赖全局变量）
+const encryptDataWithKey = async (data: string, ivHex: string, sharedSecret: string) => {
+  try {
+    // 使用传入的共享密钥，而非全局的cryptoData.sharedSecret
+    const keyBuffer = Uint8Array.from(sharedSecret.match(/.{1,2}/g) || [], (byte) =>
+      parseInt(byte, 16),
+    )
+    const ivBuffer = Uint8Array.from(ivHex.match(/.{1,2}/g) || [], (byte) => parseInt(byte, 16))
+
+    const key = await window.crypto.subtle.importKey('raw', keyBuffer, { name: 'AES-CBC' }, false, [
+      'encrypt',
+    ])
+
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: 'AES-CBC', iv: ivBuffer },
+      key,
+      new TextEncoder().encode(data),
+    )
+
+    return Array.from(new Uint8Array(encrypted))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  } catch (error) {
+    console.error('加密失败:', error)
+    throw error
+  }
+}
+// 初始化ECDH密钥交换（使用Web Crypto API，与登录逻辑一致）
+const initECDHExchangeWithWebCrypto = async () => {
+  try {
+    // 1. 生成客户端ECDH密钥对（P-256曲线，与后端匹配）
+    const keyPair = await window.crypto.subtle.generateKey(
+      { name: 'ECDH', namedCurve: 'P-256' },
+      true, // 允许提取密钥
+      ['deriveBits'], // 仅用于派生共享密钥
+    )
+
+    // 2. 导出客户端公钥（原始格式，65字节未压缩）
+    const publicKeyBuffer = await window.crypto.subtle.exportKey('spki', keyPair.publicKey)
+    const uint8Array = new Uint8Array(publicKeyBuffer)
+    const rawPublicKey = uint8Array.slice(-65) // 提取最后65字节（未压缩公钥）
+    const clientPublicKey = btoa(String.fromCharCode(...rawPublicKey))
+
+    // 3. 获取服务器公钥
+    const serverPubRes = await axios.get('/admin/api/auth/ecdh/public/key')
+    if (serverPubRes.code !== 200 || !serverPubRes.data.serverPublicKey) {
+      throw new Error('获取服务器公钥失败')
+    }
+    const serverPublicKey = serverPubRes.data.serverPublicKey
+
+    // 4. 发送客户端公钥给后端，完成交换
+    const exchangeRes = await axios.post(
+      '/admin/api/auth/ecdh/exchange',
+      { clientPublicKey },
+      { withCredentials: true },
+    )
+    if (!exchangeRes.success) {
+      throw new Error('密钥交换失败: ' + (exchangeRes.data?.message || '未知错误'))
+    }
+
+    // 5. 导入服务器公钥（原始格式）
+    const serverPubBuffer = Uint8Array.from(atob(serverPublicKey), (c) => c.charCodeAt(0))
+    const importedServerPubKey = await window.crypto.subtle.importKey(
+      'raw', // 原始公钥格式（65字节）
+      serverPubBuffer,
+      { name: 'ECDH', namedCurve: 'P-256' },
+      false, // 不可提取
+      [], // 无需用法
+    )
+
+    // 6. 派生共享密钥（256位）
+    const sharedSecretBits = await window.crypto.subtle.deriveBits(
+      { name: 'ECDH', public: importedServerPubKey },
+      keyPair.privateKey,
+      256, // 密钥长度
+    )
+
+    // 7. 转换共享密钥为16进制字符串（与登录逻辑一致）
+    const sharedSecret = Array.from(new Uint8Array(sharedSecretBits))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+
+    // 8. 生成随机IV（16字节，用于AES加密）
+    const iv = window.crypto.getRandomValues(new Uint8Array(16))
+    const ivHex = Array.from(iv)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+
+    return { sharedSecret, iv: ivHex }
+  } catch (error) {
+    throw new Error('密钥交换失败: ' + (error instanceof Error ? error.message : '未知错误'))
+  }
 }
 </script>
 
@@ -325,6 +473,9 @@ const handleOpenCreate = () => {
         <el-form :model="loginForm" label-width="80px" label-position="top" class="login-form">
           <!-- 账号 -->
           <el-form-item label="账号">
+            <template #label>
+              <span style="color: #fff">账号</span>
+            </template>
             <el-input
               v-model="loginForm.account"
               placeholder="请输入账号"
@@ -335,6 +486,9 @@ const handleOpenCreate = () => {
 
           <!-- 密码 -->
           <el-form-item label="密码">
+            <template #label>
+              <span style="color: #fff">密码</span>
+            </template>
             <el-input
               v-model="loginForm.password"
               type="password"
@@ -345,7 +499,10 @@ const handleOpenCreate = () => {
           </el-form-item>
 
           <!-- 验证码 -->
-          <el-form-item label="验证码">
+          <el-form-item v-if="!createDialog" label="验证码">
+            <template #label>
+              <span style="color: #fff">验证码</span>
+            </template>
             <el-input
               v-model="loginForm.captcha"
               placeholder="请输入验证码"
@@ -370,7 +527,7 @@ const handleOpenCreate = () => {
           </el-form-item>
 
           <!-- 记住我 + 忘记密码 -->
-          <el-form-item>
+          <el-form-item v-if="!createDialog">
             <div class="remember-forgot">
               <div>
                 <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
@@ -386,12 +543,25 @@ const handleOpenCreate = () => {
         </el-form>
 
         <!-- 登录按钮 + 离线登录按钮 -->
-        <div class="btn-group">
+        <div class="btn-group" v-if="!createDialog">
           <el-button type="primary" @click="handleLogin" :loading="isLoading" :disabled="isLoading">
             {{ isLoading ? '登录中...' : '登录' }}
           </el-button>
           <el-button type="info" @click="handleOfflineLogin" :disabled="isLoading">
             离线登录
+          </el-button>
+        </div>
+        <div v-else class="btn-group">
+          <el-button
+            type="primary"
+            @click="handleCreate"
+            :loading="isLoading"
+            :disabled="isLoading"
+          >
+            注册
+          </el-button>
+          <el-button type="info" @click="createDialog = false" :disabled="isLoading">
+            取消注册
           </el-button>
         </div>
 
