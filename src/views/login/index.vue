@@ -1,30 +1,215 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '@/stores/login'
-import { User, Lock, RefreshRight } from '@element-plus/icons-vue' // 新增验证码刷新图标
+import { User, Lock, RefreshRight } from '@element-plus/icons-vue'
+import axios from '../../utils/axios'
 
-const loginForm = ref({
-  account: 'lsj', // 默认账号
-  password: '123456', // 示例密码
-  captcha: '', // 新增验证码字段
-  remember: false, // 记住我
+// 加密相关变量
+const cryptoData = reactive({
+  serverPublicKey: '', // 服务器公钥
+  clientPrivateKey: '', // 客户端私钥
+  clientPublicKey: '', // 客户端公钥
+  sharedSecret: '', // 共享密钥
+  captcha: {
+    svg: '', // 验证码SVG
+    encryptedText: '', // 加密的验证码文本
+    iv: '', // 加密向量
+  },
 })
-const captchaSrc = ref(
-  'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4',
-) // 验证码接口（需替换为真实接口）
+
+// 登录表单数据
+const loginForm = ref({
+  account: 'lsj',
+  password: '123456',
+  captcha: '',
+  remember: false,
+})
+
+// 状态变量
 const isLoading = ref(false)
+const isKeyExchanged = ref(false)
+const captchaLoading = ref(false)
+
+// 路由和状态管理
 const loginStore = useLoginStore()
 const router = useRouter()
 
-// 模拟获取验证码（实际需调用后端接口）
-const refreshCaptcha = () => {
-  // 这里替换为真实的验证码接口请求
-  captchaSrc.value = `https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4?${Date.now()}`
+// 页面加载时初始化
+onMounted(async () => {
+  try {
+    // 1. 获取服务器公钥
+    await getServerPublicKey()
+    // 2. 生成客户端密钥对并交换
+    await generateClientKeyPair()
+    await exchangePublicKey()
+    // 3. 获取验证码
+    await getCaptcha()
+  } catch (error) {
+    console.error('初始化失败:', error)
+    ElMessage.error('初始化失败，请刷新页面重试')
+  }
+})
+
+// 1. 获取服务器公钥
+const getServerPublicKey = async () => {
+  try {
+    const res = await axios.get('/admin/api/auth/ecdh/public/key')
+    if (res.code === 200 && res.data.serverPublicKey) {
+      cryptoData.serverPublicKey = res.data.serverPublicKey
+      return true
+    }
+
+    console.log(res, '==res')
+
+    throw new Error('获取服务器公钥失败')
+  } catch (error) {
+    console.error('获取服务器公钥错误:', error)
+    throw error
+  }
 }
 
+// 2. 生成客户端ECDH密钥对
+const generateClientKeyPair = () => {
+  return new Promise((resolve, reject) => {
+    window.crypto.subtle
+      .generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey', 'deriveBits'])
+      .then((keyPair) => {
+        return window.crypto.subtle.exportKey('spki', keyPair.publicKey).then((spkiBuffer) => {
+          // 关键：从 SPKI 格式中提取原始公钥（最后65字节）
+          const uint8Array = new Uint8Array(spkiBuffer)
+          const rawPublicKey = uint8Array.slice(-65) // 提取未压缩公钥（65字节）
+
+          // 转换为 base64（仅原始公钥部分）
+          const clientPublicKey = btoa(String.fromCharCode(...rawPublicKey))
+
+          cryptoData.clientPublicKey = clientPublicKey
+          cryptoData.clientPrivateKey = keyPair.privateKey
+          console.log('客户端原始公钥（base64）:', clientPublicKey.substring(0, 30) + '...')
+          resolve(true)
+        })
+      })
+      .catch((error) => {
+        console.error('生成密钥对失败:', error)
+        reject(error)
+      })
+  })
+}
+
+// 3. 交换公钥并计算共享密钥
+const exchangePublicKey = async () => {
+  try {
+    const res = await axios.post(
+      '/admin/api/auth/ecdh/exchange',
+      { clientPublicKey: cryptoData.clientPublicKey },
+      { withCredentials: true },
+    )
+
+    if (res.success) {
+      // 1. 导入服务器公钥（关键修改：用 'raw' 格式，而非 'spki'）
+      const serverPublicKey = await window.crypto.subtle.importKey(
+        'raw', // 改为 'raw' 格式（匹配后端返回的原始公钥）
+        Uint8Array.from(atob(cryptoData.serverPublicKey), (c) => c.charCodeAt(0)),
+        { name: 'ECDH', namedCurve: 'P-256' }, // 保持与曲线匹配
+        false,
+        [],
+      )
+
+      // 2. 派生共享密钥（参数不变）
+      const sharedSecret = await window.crypto.subtle.deriveBits(
+        { name: 'ECDH', public: serverPublicKey },
+        cryptoData.clientPrivateKey,
+        256,
+      )
+
+      // 3. 存储共享密钥（不变）
+      cryptoData.sharedSecret = Array.from(new Uint8Array(sharedSecret))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+
+      isKeyExchanged.value = true
+      return true
+    }
+
+    throw new Error('密钥交换失败')
+  } catch (error) {
+    console.error('密钥交换错误:', error)
+    throw error
+  }
+}
+// 4. 获取验证码
+const getCaptcha = async () => {
+  if (!isKeyExchanged.value) {
+    ElMessage.warning('请先完成密钥交换')
+    return
+  }
+
+  captchaLoading.value = true
+  try {
+    const res = await axios.get('/admin/api/auth/captcha')
+    console.log(res, '===123')
+
+    if (res.code) {
+      cryptoData.captcha.svg = res.data.captchaSvg
+      cryptoData.captcha.encryptedText = res.data.encryptedCaptcha
+      cryptoData.captcha.iv = res.data.iv
+      return true
+    }
+    throw new Error('获取验证码失败')
+  } catch (error) {
+    console.error('获取验证码错误:', error)
+    ElMessage.error('获取验证码失败，请重试')
+    throw error
+  } finally {
+    captchaLoading.value = false
+  }
+}
+
+// 刷新验证码
+const refreshCaptcha = async () => {
+  try {
+    await getCaptcha()
+    loginForm.value.captcha = '' // 清空输入
+  } catch (error) {
+    console.error('刷新验证码失败:', error)
+  }
+}
+
+// AES加密函数
+const encryptData = async (data: string, ivHex: string) => {
+  try {
+    // 将共享密钥和IV转换为ArrayBuffer
+    const keyBuffer = Uint8Array.from(cryptoData.sharedSecret.match(/.{1,2}/g) || [], (byte) =>
+      parseInt(byte, 16),
+    )
+    const ivBuffer = Uint8Array.from(ivHex.match(/.{1,2}/g) || [], (byte) => parseInt(byte, 16))
+
+    // 导入密钥
+    const key = await window.crypto.subtle.importKey('raw', keyBuffer, { name: 'AES-CBC' }, false, [
+      'encrypt',
+    ])
+
+    // 加密数据
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: 'AES-CBC', iv: ivBuffer },
+      key,
+      new TextEncoder().encode(data),
+    )
+
+    // 转换为十六进制字符串
+    return Array.from(new Uint8Array(encrypted))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  } catch (error) {
+    console.error('加密失败:', error)
+    throw error
+  }
+}
+
+// 处理登录
 const handleLogin = async () => {
+  // 表单验证
   if (!loginForm.value.account) {
     ElMessage.error('请输入账号')
     return
@@ -37,36 +222,74 @@ const handleLogin = async () => {
     ElMessage.error('请输入验证码')
     return
   }
+  if (!isKeyExchanged.value) {
+    ElMessage.error('密钥交换未完成，请刷新页面重试')
+    return
+  }
 
   isLoading.value = true
   try {
-    await new Promise((resolve) => setTimeout(resolve, 800))
+    // 生成新的IV用于本次加密
+    const iv = window.crypto.getRandomValues(new Uint8Array(16))
+    const ivHex = Array.from(iv)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
 
-    // 模拟登录校验（实际需调用后端接口）
-    if (
-      loginForm.value.account === 'lsj' &&
-      loginForm.value.password === '123456' &&
-      loginForm.value.captcha === '1111' // 示例验证码，实际需后端校验
-    ) {
+    // 加密密码和验证码
+    const encryptedPassword = await encryptData(loginForm.value.password, ivHex)
+    const encryptedCaptcha = await encryptData(loginForm.value.captcha, ivHex)
+
+    // 发送登录请求
+    const res = await axios.post('/admin/api/auth/login', {
+      account: loginForm.value.account, // 账号明文传输（一般账号不需要加密）
+      encryptedPassword,
+      encryptedUserCaptcha: encryptedCaptcha,
+      iv: ivHex,
+    })
+
+    // 处理登录结果
+    if (res.token) {
       ElMessage.success('登录成功，正在进入系统...')
-      loginStore.increment(true)
+      // 存储token等信息
+
+      loginStore.setToken(res.token)
+      loginStore.setUserInfo({ username: loginForm.value.account })
+
+      // 记住我功能实现
+      if (loginForm.value.remember) {
+        localStorage.setItem('username', loginForm.value.account)
+        // 实际项目中不建议存储密码，这里仅为示例
+      } else {
+        localStorage.removeItem('username')
+      }
+
       setTimeout(() => {
         router.push({ name: 'home' })
       }, 1000)
     } else {
-      ElMessage.error('账号、密码或验证码错误，请重试')
-      refreshCaptcha() // 校验失败时刷新验证码
+      ElMessage.error(res.message || '登录失败')
+      refreshCaptcha() // 登录失败刷新验证码
     }
+  } catch (error) {
+    console.error('登录错误:', error)
+    ElMessage.error('登录失败，请重试')
+    refreshCaptcha() // 登录失败刷新验证码
   } finally {
     isLoading.value = false
   }
 }
 
-// 离线登录逻辑（根据实际需求实现）
+// 离线登录逻辑
 const handleOfflineLogin = () => {
   ElMessage.info('进入离线登录流程...')
   // 可跳转离线登录页面或执行离线逻辑
   // router.push({ name: 'offline-login' })
+}
+
+// 注册逻辑
+const createDialog = ref(false)
+const handleOpenCreate = () => {
+  createDialog.value = true
 }
 </script>
 
@@ -94,9 +317,8 @@ const handleOfflineLogin = () => {
           <img
             src="https://p1.music.126.net/XmmQY9RuWF1RY-Z3QmA9Sg==/109951165545584764.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0"
             style="width: 100px; height: 100px"
-            alt=""
+            alt="系统Logo"
           />
-          <!-- <h2>系统登录</h2> -->
           <p class="subtitle">欢迎回来，请登录您的账号</p>
         </div>
 
@@ -133,12 +355,12 @@ const handleOfflineLogin = () => {
               <!-- 验证码图片 + 刷新按钮 -->
               <template #suffix>
                 <div class="captcha-wrapper">
-                  <img
-                    :src="captchaSrc"
-                    alt="captcha"
+                  <div
                     class="captcha-img"
                     @click="refreshCaptcha"
-                  />
+                    v-html="cryptoData.captcha.svg"
+                    :class="{ 'captcha-loading': captchaLoading }"
+                  ></div>
                   <el-icon class="refresh-icon" @click="refreshCaptcha">
                     <RefreshRight />
                   </el-icon>
@@ -157,6 +379,7 @@ const handleOfflineLogin = () => {
                 <el-link type="primary" @click="() => ElMessage.info('忘记密码逻辑待实现')"
                   >忘记密码？</el-link
                 >
+                <el-link type="primary" @click="handleOpenCreate">注册</el-link>
               </div>
             </div>
           </el-form-item>
@@ -173,7 +396,6 @@ const handleOfflineLogin = () => {
         </div>
 
         <!-- 版权信息 -->
-        <!-- <div class="copyright">© 2025 Great Li CRM. © Great Li CRM. 版权所有。</div> -->
         <div class="copyright">© 2025 lsj. 版权所有。</div>
       </div>
     </div>
@@ -280,8 +502,9 @@ body {
         cursor: pointer;
 
         .captcha-img {
-          width: 80px;
-          height: 36px;
+          background-color: #fff;
+          width: 150px;
+          height: 48px;
           object-fit: cover;
           border-radius: 4px;
         }

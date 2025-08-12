@@ -103,7 +103,7 @@
       </el-form-item>
 
       <el-form-item label="图片地址">
-        <el-input v-model="formall.img" placeholder="请输入图片地址"></el-input>
+        <el-input v-model="formall.img" :disabled="isEdit" placeholder="请输入图片地址"></el-input>
       </el-form-item>
     </el-form>
 
