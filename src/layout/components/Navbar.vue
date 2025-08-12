@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useLoginStore } from '@/stores/login'
+import axios from '../../utils/axios'
 const loginStore = useLoginStore()
 
 const route = useRoute()
@@ -53,6 +55,28 @@ const handleJump = async (index: number) => {
 
   router.push(routeAllList.value[index].path)
 }
+
+// 在组件中
+
+const handleLogout = async () => {
+  try {
+    // 调用退出登录方法
+    loginStore.logout() // 如果logout有后端请求，需要await
+
+    const res = await axios.post('/admin/api/auth/logout', {}, { withCredentials: true })
+
+    console.log(res, '==321')
+
+    // 确保路由跳转
+    router.push({ name: 'login' })
+
+    // 显示退出成功提示
+    ElMessage.success('退出成功')
+  } catch (error) {
+    console.error('退出失败', error)
+    ElMessage.error('退出失败，请重试')
+  }
+}
 </script>
 
 <template>
@@ -92,7 +116,7 @@ const handleJump = async (index: number) => {
                 <router-link
                   :to="{ name: 'login' }"
                   type="text"
-                  @click="loginStore.close()"
+                  @click="handleLogout"
                   style="text-decoration: none; color: #7a6966"
                   >退出</router-link
                 >

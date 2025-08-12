@@ -11,17 +11,19 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const loginStore = useLoginStore()
 
-  // if (to.meta.title) {
-  //   document.title = to.meta.title
-  // }
+  // 关键：用token是否存在判断登录状态（而非count）
+  const isLogin = !!loginStore.token // 假设store中用`token`存储令牌
 
-  if (!loginStore.count && to.name !== 'login') {
+  // 未登录且目标不是登录页 → 强制跳转登录
+  if (!isLogin && to.name !== 'login') {
     return { name: 'login' }
   }
 
-  if (loginStore.count && to.name === 'login') {
+  // 已登录且目标是登录页 → 强制跳转首页
+  if (isLogin && to.name === 'login') {
     return { name: 'home' }
   }
+
   return true
 })
 
