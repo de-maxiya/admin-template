@@ -41,6 +41,7 @@ export const useLoginStore = defineStore('login', {
       this.userInfo = info
       localStorage.setItem('userInfo', JSON.stringify(info))
     },
+
     // 退出登录方法
     logout() {
       // 1. 清除本地存储的token和用户信息

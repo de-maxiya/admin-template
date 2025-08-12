@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -128,4 +128,4 @@ body {
     touch-action: none; /* 禁用触摸滚动 */
   }
 }
-</style>
+</style> -->

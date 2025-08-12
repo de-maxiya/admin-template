@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -177,7 +177,7 @@ const refreshCaptcha = async () => {
 }
 
 // AES加密函数
-const encryptData = async (data: string, ivHex: string) => {
+const encryptData = async (data, ivHex) => {
   try {
     // 将共享密钥和IV转换为ArrayBuffer
     const keyBuffer = Uint8Array.from(cryptoData.sharedSecret.match(/.{1,2}/g) || [], (byte) =>
@@ -347,7 +347,7 @@ const handleCreate = async () => {
   }
 }
 // 新增：带密钥参数的加密函数（避免依赖全局变量）
-const encryptDataWithKey = async (data: string, ivHex: string, sharedSecret: string) => {
+const encryptDataWithKey = async (data, ivHex, sharedSecret) => {
   try {
     // 使用传入的共享密钥，而非全局的cryptoData.sharedSecret
     const keyBuffer = Uint8Array.from(sharedSecret.match(/.{1,2}/g) || [], (byte) =>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import sidebar from './components/Sidebar/index.vue'
 import navbar from './components/Navbar.vue'
 </script>

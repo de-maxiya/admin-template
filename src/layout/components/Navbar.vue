@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -8,17 +8,14 @@ const loginStore = useLoginStore()
 
 const route = useRoute()
 const router = useRouter()
-interface ObjMate {
-  title: string
-  icon: string
-}
-const routeAllList = ref<{ path: string; meta: ObjMate }[]>([])
+
+const routeAllList = ref([])
 
 // 使用 ref 确保 currentIndex 响应式
 const currentIndex = ref(0)
 onMounted(() => {
   if (routeAllList.value.some((it) => it.path === route.path)) return
-  const meta = route.meta as unknown as ObjMate
+  const meta = route.meta
   routeAllList.value.push({
     path: route.path,
     meta,
@@ -37,7 +34,7 @@ watch(
       // 如果满足10条，删除第一条数据
       if (routeAllList.value.length === 10) routeAllList.value.shift()
       // 只有不存在，才会新增
-      const meta = newRoute.meta as unknown as ObjMate
+      const meta = newRoute.meta
       routeAllList.value.push({
         path: newRoute.path,
         meta,
@@ -50,7 +47,7 @@ watch(
   { immediate: true },
 )
 
-const handleJump = async (index: number) => {
+const handleJump = async (index) => {
   currentIndex.value = index // 更新当前索引
 
   router.push(routeAllList.value[index].path)
