@@ -19,7 +19,7 @@ const handleChange = (val) => {
         position: 'relative',
         width: `calc(100% - ${isCollapse ? '80px' : '240px'})`,
         marginLeft: isCollapse ? '80px' : '240px',
-        transition: 'all 0.3s',
+        transition: 'all 0.1s',
       }"
     >
       <navbar />

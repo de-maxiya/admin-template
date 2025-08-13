@@ -82,10 +82,7 @@ const handleCloseOpen = () => {
         <!-- 渲染一级菜单项 -->
         <el-menu-item v-if="item.type === 'item'" :index="item.path">
           <template #title>
-            <el-icon v-if="item.icon && item.icon.startsWith('el-')" :style="{ color: 'black' }">
-              <component :is="item.meta.icon" />
-            </el-icon>
-            <el-icon v-else :style="{ color: 'black' }">
+            <el-icon>
               <component :is="item.meta.icon" />
             </el-icon>
             <span>{{ item.meta.title }}</span>
@@ -95,7 +92,7 @@ const handleCloseOpen = () => {
         <!-- 渲染子菜单 -->
         <el-sub-menu v-else :index="item.path">
           <template #title>
-            <el-icon :style="{ color: 'black' }">
+            <el-icon>
               <component :is="item.meta.icon" />
             </el-icon>
             <span>{{ item.meta.title }}</span>
@@ -107,8 +104,8 @@ const handleCloseOpen = () => {
             :key="child.path"
             :index="item.path + '/' + child.path"
           >
-            <el-icon :style="{ color: 'black' }">
-              <component :is="item.meta.icon" />
+            <el-icon>
+              <component :is="child.meta.icon" />
             </el-icon>
             <span> {{ child.meta.title }}</span>
           </el-menu-item>
