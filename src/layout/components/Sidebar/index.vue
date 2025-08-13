@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineEmits } from 'vue'
 // import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import routes from '@/router/routes'
@@ -19,24 +19,57 @@ const activeMenu = () => {
 onMounted(() => {
   menuItems.value = routes.filter((item) => !item.hidden) // 为true不是菜单栏目的数据
 })
-
 const handleClick = (key) => {
   console.log(key, route)
+}
+import img from '@/assets/themify-favicon.png'
+// const props = defineProps({
+//   isCollapse: {
+//     type: Boolean,
+//     default: false,
+//   },
+// })
+const emit = defineEmits(['sendData', 'updateCount'])
+const handleCloseOpen = () => {
+  isCollapse.value = !isCollapse.value
+  emit('change', isCollapse.value)
 }
 </script>
 
 <template>
-  <div class="sidebar">
-    <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
-      <el-radio-button :value="false">expand</el-radio-button>
-      <el-radio-button :value="true">collapse</el-radio-button>
-    </el-radio-group> -->
+  <div class="sidebar" :style="{ width: isCollapse ? '60px' : '220px' }">
+    <div
+      :style="{
+        display: 'flex',
+        // 折叠时改为居中对齐，非折叠时保持两端对齐
+        justifyContent: isCollapse ? 'center' : 'space-between',
+        alignItems: 'center',
+        padding: '5px',
+        backgroundColor: '#fcfcfc',
+        textAlign: 'center',
+      }"
+    >
+      <div v-if="!isCollapse" style="display: flex; align-items: center; gap: 8px">
+        <el-image :src="img" style="width: 35px; height: 35px"></el-image>
+        <span>LSJ</span>
+      </div>
+      <div>
+        <el-icon
+          style="height: 35px; margin: auto"
+          :size="20"
+          color="#579cfe"
+          @click="handleCloseOpen"
+        >
+          <Fold />
+        </el-icon>
+      </div>
+    </div>
     <el-menu
-      active-text-color="#ffd04b"
-      background-color="#212c3d"
+      active-text-color="#579cfe"
+      background-color="white"
       class="el-menu-vertical-demo"
       :default-active="activeMenu()"
-      text-color="#fff"
+      text-color="black"
       style="border: none"
       :collapse="isCollapse"
       router
@@ -49,11 +82,11 @@ const handleClick = (key) => {
         <!-- 渲染一级菜单项 -->
         <el-menu-item v-if="item.type === 'item'" :index="item.path">
           <template #title>
-            <el-icon v-if="item.icon && item.icon.startsWith('el-')" :style="{ color: 'white' }">
-              <i :class="item.icon"></i>
+            <el-icon v-if="item.icon && item.icon.startsWith('el-')" :style="{ color: 'black' }">
+              <component :is="item.meta.icon" />
             </el-icon>
-            <el-icon v-else :style="{ color: 'white' }">
-              <component :is="item.icon" />
+            <el-icon v-else :style="{ color: 'black' }">
+              <component :is="item.meta.icon" />
             </el-icon>
             <span>{{ item.meta.title }}</span>
           </template>
@@ -62,8 +95,8 @@ const handleClick = (key) => {
         <!-- 渲染子菜单 -->
         <el-sub-menu v-else :index="item.path">
           <template #title>
-            <el-icon :style="{ color: 'white' }">
-              <i :class="item.icon"></i>
+            <el-icon :style="{ color: 'black' }">
+              <component :is="item.meta.icon" />
             </el-icon>
             <span>{{ item.meta.title }}</span>
           </template>
@@ -74,8 +107,8 @@ const handleClick = (key) => {
             :key="child.path"
             :index="item.path + '/' + child.path"
           >
-            <el-icon :style="{ color: 'white' }">
-              <i :class="item.icon"></i>
+            <el-icon :style="{ color: 'black' }">
+              <component :is="item.meta.icon" />
             </el-icon>
             <span> {{ child.meta.title }}</span>
           </el-menu-item>
@@ -90,14 +123,16 @@ const handleClick = (key) => {
   position: fixed;
   left: 0;
   top: 0;
-  width: 240px;
-  height: 100vh;
-  max-height: 100vh;
+  height: 96vh;
+  margin: 2vh 0px 2vh 20px;
+  max-height: 96vh;
+  border-radius: 20px;
+  overflow: hidden;
   /* overflow: scroll; */
-  background-color: #334156;
+  background-color: white;
 }
 .sidebar-menu {
-  background-color: #212d3d;
+  background-color: white;
   color: white;
 }
 </style>
