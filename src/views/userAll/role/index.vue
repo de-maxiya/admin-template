@@ -34,6 +34,7 @@
 
   <el-table v-loading="loading" :data="tableData" style="width: 100%">
     <el-table-column prop="id" label="ID" width="180" />
+    <el-table-column prop="account" label="用户账号" width="180" />
     <el-table-column prop="name" label="用户名称" width="180" />
     <el-table-column prop="age" label="用户年龄" width="180" />
     <el-table-column prop="status" label="用户状态" width="180" />

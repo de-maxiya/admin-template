@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, defineProps } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useLoginStore } from '@/stores/login'
 import axios from '../../utils/axios'
@@ -74,74 +74,105 @@ const handleLogout = async () => {
     ElMessage.error('退出失败，请重试')
   }
 }
+
+defineProps({
+  isCollapse: {
+    type: Boolean,
+    default: false,
+  },
+})
+import {
+  Setting,
+  SwitchButton,
+  Monitor,
+  ChromeFilled,
+  ElementPlus,
+  Sunny,
+  Moon,
+} from '@element-plus/icons-vue'
 </script>
 
 <template>
-  <div class="navbar">
-    <div class="leftTit">
-      <div v-for="(item, index) in routeAllList" :key="index" class="breadcrumb">
-        <span @click="handleJump(index)" :class="{ active: index === currentIndex }">
-          {{ item.meta.title }}
-        </span>
-      </div>
+  <div
+    class="leftTit"
+    :style="{
+      left: isCollapse ? '100px' : '260px',
+    }"
+  >
+    <div v-for="(item, index) in routeAllList" :key="index" class="breadcrumb">
+      <span @click="handleJump(index)" :class="{ active: index === currentIndex }">
+        {{ item.meta.title }}
+      </span>
     </div>
-    <div class="rightTit">
-      <img
-        src="https://picsum.photos/50/50"
-        alt="用户头像"
-        class="w-8 h-8 rounded-full object-cover"
-        style="width: 50px; height: 50px"
-      />
+  </div>
 
-      <div>
-        <el-dropdown>
-          <span class="el-dropdown-link">
-            操作
-            <el-icon class="el-icon--right">
-              <arrow-down />
-            </el-icon>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item>
-                <router-link :to="{ name: 'home' }" style="text-decoration: none; color: #7a6966">
-                  首页</router-link
-                >
-              </el-dropdown-item>
-              <!-- <el-dropdown-item>信息</el-dropdown-item> -->
-              <el-dropdown-item>
-                <router-link
-                  :to="{ name: 'login' }"
-                  type="text"
-                  @click="handleLogout"
-                  style="text-decoration: none; color: #7a6966"
-                  >退出</router-link
-                >
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
+  <div class="rightTit">
+    <!-- <img
+      src="https://picsum.photos/50/50"
+      alt="用户头像"
+      class="w-8 h-8 rounded-full object-cover"
+      style="width: 50px; height: 50px"
+    /> -->
+    <!-- <el-avatar :size="50" :src="circleUrl" /> -->
+    <el-button :icon="Monitor" />
+    <el-button :icon="ChromeFilled" />
+    <el-button :icon="ElementPlus" />
+    <el-button :icon="Setting" />
+    <el-button :icon="Sunny || Moon" />
+    <el-button :icon="SwitchButton" />
+    <div>
+      <el-dropdown>
+        <span class="el-dropdown-link">
+          操作
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item>
+              <router-link :to="{ name: 'home' }" style="text-decoration: none; color: #7a6966">
+                首页</router-link
+              >
+            </el-dropdown-item>
+            <!-- <el-dropdown-item>信息</el-dropdown-item> -->
+            <el-dropdown-item>
+              <router-link
+                :to="{ name: 'login' }"
+                type="text"
+                @click="handleLogout"
+                style="text-decoration: none; color: #7a6966"
+                >退出</router-link
+              >
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.navbar {
-  height: 50px;
-  width: 100%;
-  box-shadow: 0 2px 4px #f3f4f5;
-  // background-color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  .rightTit {
-    display: grid;
-    grid-template-columns: 50px 1fr;
-    align-items: center;
-    gap: 20px;
+.leftTit {
+  position: fixed;
+  top: 20px;
+  z-index: 99;
+}
+.rightTit {
+  .el-button {
+    margin: 0;
+    height: 50px;
+    line-height: 50px;
+    border: none;
+    font-size: 20px;
   }
+  background-color: white;
+  position: fixed;
+  display: flex;
+  top: 20px;
+  right: 30px;
+  z-index: 99;
+  align-items: center;
 }
 
 .breadcrumb {
