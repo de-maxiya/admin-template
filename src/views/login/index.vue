@@ -270,12 +270,14 @@ const handleLogin = async () => {
       }, 1000)
     } else {
       ElMessage.error(res.message || '登录失败')
-      refreshCaptcha() // 登录失败刷新验证码
+      window.location.reload(true) // 直接刷新页面，重新获取最新密钥
+      // refreshCaptcha() // 登录失败刷新验证码
     }
   } catch (error) {
     console.error('登录错误:', error)
     ElMessage.error('登录失败，请重试')
-    refreshCaptcha() // 登录失败刷新验证码
+    // refreshCaptcha() // 登录失败刷新验证码
+    window.location.reload(true) // 直接刷新页面，重新获取最新密钥
   } finally {
     isLoading.value = false
   }
