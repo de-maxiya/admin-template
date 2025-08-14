@@ -9,9 +9,11 @@ const handleChange = (val) => {
 </script>
 
 <template>
-  <div class="all" style="display: flex">
+  <!-- 整体大布局 -->
+  <div class="all">
+    <!-- 侧边栏 -->
     <sidebar @change="handleChange" />
-
+    <!-- 内容区域 -->
     <div
       :style="{
         position: 'relative',
@@ -20,38 +22,38 @@ const handleChange = (val) => {
         transition: 'all 0.1s',
       }"
     >
+      <!-- 导航栏 -->
       <navbar :isCollapse="isCollapse" />
 
+      <!-- 路由出口 -->
       <div class="routerView">
-        <router-view />
+        <div class="routerViewContent">
+          <router-view />
+        </div>
       </div>
     </div>
-
-    <!-- <img
-      src="https://picsum.photos/200/200"
-      alt="用户头像"
-      class="w-8 h-8 rounded-full object-cover"
-      style="width: 200px; height: 200px"
-    /> -->
   </div>
 </template>
-<!-- https://sxcontent9668.azureedge.us/cms-assets/assets/Mars_Rotation_Web_HB_d96299f9de.mp4 -->
 <style scoped>
 .routerView {
-  padding: 20px;
-  background-color: white;
-  margin: 20px;
+  padding: 0px 20px;
   margin-top: 6vh;
-  border-radius: 10px;
-  overflow: hidden;
   margin-bottom: 2vh;
   height: 92vh;
-  overflow-y: auto;
+  .routerViewContent {
+    border-radius: 10px;
+    height: auto;
+    padding: 20px;
+    max-height: 100%;
+    overflow: hidden;
+    background-color: white;
+    overflow-y: auto;
+  }
 }
 .all {
+  display: flex;
   width: 100%;
   height: 100vh;
   background-color: #f5f5f5;
-  /* overflow: scroll; */
 }
 </style>

@@ -41,7 +41,7 @@
     <el-table-column prop="gender" label="用户性别" width="180" />
     <el-table-column prop="img" label="用户头像">
       <template #default="scope">
-        <el-image style="width: 100px; height: 100px" :src="scope.row.img"></el-image>
+        <el-image style="width: 50px; height: 50px" :src="scope.row.img"></el-image>
       </template>
     </el-table-column>
 
