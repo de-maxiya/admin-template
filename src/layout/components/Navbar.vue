@@ -119,36 +119,7 @@ import {
     <el-button :icon="ElementPlus" />
     <el-button :icon="Setting" />
     <el-button :icon="Sunny || Moon" />
-    <el-button :icon="SwitchButton" />
-    <div>
-      <el-dropdown>
-        <span class="el-dropdown-link">
-          操作
-          <el-icon class="el-icon--right">
-            <arrow-down />
-          </el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>
-              <router-link :to="{ name: 'home' }" style="text-decoration: none; color: #7a6966">
-                首页</router-link
-              >
-            </el-dropdown-item>
-            <!-- <el-dropdown-item>信息</el-dropdown-item> -->
-            <el-dropdown-item>
-              <router-link
-                :to="{ name: 'login' }"
-                type="text"
-                @click="handleLogout"
-                style="text-decoration: none; color: #7a6966"
-                >退出</router-link
-              >
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </div>
+    <el-button @click="handleLogout" :icon="SwitchButton" />
   </div>
 </template>
 
