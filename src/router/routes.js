@@ -38,8 +38,8 @@ const routes = [
       {
         path: 'export', // 移除开头的斜杠，使用相对路径
         name: 'export',
-        meta: { title: '数据导出', icon: 'FolderOpened' },
-        component: () => import('@/views/dataList/list/index.vue'),
+        meta: { title: '计算个人养老金', icon: 'FolderOpened' },
+        component: () => import('@/views/dataList/old/index.vue'),
       },
     ],
   },
