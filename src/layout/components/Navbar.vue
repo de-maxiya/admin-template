@@ -94,40 +94,55 @@ import {
 
 <template>
   <div
-    class="leftTit"
+    class="allTit"
     :style="{
       left: isCollapse ? '100px' : '260px',
+      width: isCollapse ? 'calc(100% - 116px)' : 'calc(100% - 276px)',
     }"
   >
-    <div v-for="(item, index) in routeAllList" :key="index" class="breadcrumb">
-      <span @click="handleJump(index)" :class="{ active: index === currentIndex }">
-        {{ item.meta.title }}
-      </span>
+    <div
+      class="leftTit"
+      :style="{
+        left: isCollapse ? '100px' : '260px',
+      }"
+    >
+      <div v-for="(item, index) in routeAllList" :key="index" class="breadcrumb">
+        <span @click="handleJump(index)" :class="{ active: index === currentIndex }">
+          {{ item.meta.title }}
+        </span>
+      </div>
     </div>
-  </div>
 
-  <div class="rightTit">
-    <!-- <img
+    <div class="rightTit">
+      <!-- <img
       src="https://picsum.photos/50/50"
       alt="用户头像"
       class="w-8 h-8 rounded-full object-cover"
       style="width: 50px; height: 50px"
     /> -->
-    <!-- <el-avatar :size="50" :src="circleUrl" /> -->
-    <el-button :icon="Monitor" />
-    <el-button :icon="ChromeFilled" />
-    <el-button :icon="ElementPlus" />
-    <el-button :icon="Setting" />
-    <el-button :icon="Sunny || Moon" />
-    <el-button @click="handleLogout" :icon="SwitchButton" />
+      <!-- <el-avatar :size="50" :src="circleUrl" /> -->
+      <el-button :icon="Monitor" />
+      <el-button :icon="ChromeFilled" />
+      <el-button :icon="ElementPlus" />
+      <el-button :icon="Setting" />
+      <el-button :icon="Sunny || Moon" />
+      <el-button @click="handleLogout" :icon="SwitchButton" />
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.allTit {
+  position: fixed;
+  top: 0;
+
+  height: 70px;
+  z-index: 99;
+  background-color: #f5f5f5;
+}
 .leftTit {
   position: fixed;
   top: 20px;
-  z-index: 99;
 }
 .rightTit {
   .el-button {
@@ -137,13 +152,9 @@ import {
     border: none;
     font-size: 20px;
   }
-  background-color: white;
   position: fixed;
-  display: flex;
-  top: 20px;
+  top: 10px;
   right: 30px;
-  z-index: 99;
-  align-items: center;
 }
 
 .breadcrumb {
@@ -170,6 +181,7 @@ import {
 }
 .breadcrumb span.active {
   font-weight: bold;
-  color: blueviolet;
+  color: #579cfe;
+  background-color: white;
 }
 </style>

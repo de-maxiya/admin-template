@@ -22,16 +22,7 @@ const handleChange = (val) => {
     >
       <navbar :isCollapse="isCollapse" />
 
-      <div
-        style="
-          padding: 20px;
-          background-color: white;
-          margin: 20px;
-          margin-top: 85px;
-          border-radius: 10px;
-          overflow: hidden;
-        "
-      >
+      <div class="routerView">
         <router-view />
       </div>
     </div>
@@ -46,11 +37,21 @@ const handleChange = (val) => {
 </template>
 <!-- https://sxcontent9668.azureedge.us/cms-assets/assets/Mars_Rotation_Web_HB_d96299f9de.mp4 -->
 <style scoped>
+.routerView {
+  padding: 20px;
+  background-color: white;
+  margin: 20px;
+  margin-top: 6vh;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 2vh;
+  height: 92vh;
+  overflow-y: auto;
+}
 .all {
   width: 100%;
   height: 100vh;
   background-color: #f5f5f5;
   /* overflow: scroll; */
-  overflow-y: auto;
 }
 </style>
