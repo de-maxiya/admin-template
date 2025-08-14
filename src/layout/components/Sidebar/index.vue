@@ -23,12 +23,7 @@ const handleClick = (key) => {
   console.log(key, route)
 }
 import img from '@/assets/themify-favicon.png'
-// const props = defineProps({
-//   isCollapse: {
-//     type: Boolean,
-//     default: false,
-//   },
-// })
+
 const emit = defineEmits(['sendData', 'updateCount'])
 const handleCloseOpen = () => {
   isCollapse.value = !isCollapse.value
