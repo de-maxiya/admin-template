@@ -439,6 +439,8 @@ const initECDHExchangeWithWebCrypto = async () => {
     throw new Error('密钥交换失败: ' + (error instanceof Error ? error.message : '未知错误'))
   }
 }
+import video from '../../../public/Login_10s_1MB.mp4'
+const loginVideo = video
 </script>
 
 <template>
@@ -452,10 +454,11 @@ const initECDHExchangeWithWebCrypto = async () => {
         playsinline
         poster="https://picsum.photos/id/1025/1920/1080?blur=3"
       >
-        <source
+        <!-- <source
           src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4"
           type="video/mp4"
-        />
+        /> -->
+        <source :src="loginVideo" type="video/mp4" />
         <div class="fallback-bg"></div>
       </video>
       <div class="bg-overlay"></div>
