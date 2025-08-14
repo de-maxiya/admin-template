@@ -60,14 +60,15 @@
   https://p1.music.126.net/MvJMnAgamdI0R9aQXEJ9yw==/109951169632995337.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
   -->
   <el-pagination
-    v-model:current-page="currentPage4"
-    v-model:page-size="pageSize4"
-    :page-sizes="[100, 200, 300, 400]"
+    v-model:current-page="pageAll.page"
+    v-model:page-size="pageAll.pageSize"
+    :page-sizes="[10, 20]"
     :size="size"
     :disabled="disabled"
     :background="background"
-    layout="total, sizes, prev, pager, next, jumper"
-    :total="400"
+    layout="total, ->, sizes, prev, pager, next, jumper"
+    :total="count"
+    style="margin: 20px 20px 0"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
   />
@@ -123,17 +124,22 @@ import axios from 'axios'
 import { ref, onMounted, reactive } from 'vue'
 import type { ComponentSize } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
-const currentPage4 = ref(4)
-const pageSize4 = ref(100)
 const size = ref<ComponentSize>('default')
-const background = ref(false)
+const background = ref(true)
 const disabled = ref(false)
-
+const pageAll = ref({
+  page: 1,
+  pageSize: 10,
+})
 const handleSizeChange = (val: number) => {
   console.log(`${val} items per page`)
+  pageAll.value.pageSize = val
+  getList()
 }
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
+  pageAll.value.page = val
+  getList()
 }
 
 const tableData = ref([])
@@ -145,7 +151,7 @@ const formSearch = reactive({
   status: '',
   gender: '',
 })
-let formall = reactive({
+const formall = ref({
   name: '',
   age: '',
   status: '',
@@ -184,10 +190,6 @@ const genderOptions = [
 onMounted(async () => {
   await getList()
 })
-const pageAll = ref({
-  page: 1,
-  pageSize: 10,
-})
 
 const count = ref(0)
 // 获取数据
@@ -212,13 +214,14 @@ const loading = ref(false)
 
 // 关闭
 const handleClose = () => {
-  Object.assign(formall, {
+  formall.value = {
     name: '',
     age: '',
     status: '',
     gender: '',
     img: '',
-  })
+  }
+
   dialogVisible.value = false
   isEdit.value = false
 }
@@ -227,11 +230,11 @@ const handleClose = () => {
 const handleAddRole = () => {
   axios
     .post('/admin/api/user', {
-      name: formall.name,
-      age: formall.age,
-      status: formall.status,
-      gender: formall.gender,
-      img: formall.img,
+      name: formall.value.name,
+      age: formall.value.age,
+      status: formall.value.status,
+      gender: formall.value.gender,
+      img: formall.value.img,
     })
     .then(async (res) => {
       console.log(res, '===231`312')
@@ -260,7 +263,7 @@ const isEdit = ref(false)
 const handleEdit = (row: RowType) => {
   isEdit.value = true
   dialogVisible.value = true
-  formall = row
+  formall.value = JSON.parse(JSON.stringify(row))
 }
 
 //  删除
