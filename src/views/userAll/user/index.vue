@@ -1,83 +1,293 @@
 <template>
-  <el-form
-    :label-position="'top'"
-    label-width="auto"
-    :model="formLabelAlign"
-    style="max-width: 600px"
-  >
-    <el-form-item label="去年当地社会平均工资" :label-position="itemLabelPosition">
-      <el-input v-model="formLabelAlign.Salary" placeholder="请输入去年当地社会平均工资"></el-input>
-    </el-form-item>
-    <el-form-item label="本人指数化月平均缴费挡位" :label-position="itemLabelPosition">
-      <el-input
-        v-model="formLabelAlign.Gear"
-        placeholder="请输入本人指数化月平均缴费挡位"
-      ></el-input>
-    </el-form-item>
-    <el-form-item label="缴费年限" :label-position="itemLabelPosition">
-      <el-input v-model="formLabelAlign.year" placeholder="请输入缴费年限" />
-    </el-form-item>
-
-    <el-form-item label="操作">
-      <el-button type="primary" @click="handleCalculate">计算</el-button>
-
-      <el-button type="primary" @click="handleGetList">获取数据</el-button>
-
-      <!-- <img src="blob:orpheus://orpheus/83b2d0be-44cb-4ebd-9b02-2ad4ba958aca" alt="" /> -->
-      <span v-if="resValue">
-        {{ resValue }}
-      </span>
-    </el-form-item>
+  <el-form ref="form" :model="formSearch" label-width="80px" label-position="top">
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <el-form-item label="ID">
+          <el-input v-model="formSearch.id" placeholder=""></el-input>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <el-form-item label="用户名称">
+          <el-input v-model="formSearch.name" placeholder=""></el-input> </el-form-item
+      ></el-col>
+      <el-col :span="6">
+        <el-form-item label="用户年龄">
+          <el-input v-model="formSearch.age" placeholder=""></el-input> </el-form-item
+      ></el-col>
+      <el-col :span="6">
+        <el-form-item label="用户状态">
+          <el-input v-model="formSearch.status" placeholder=""></el-input> </el-form-item
+      ></el-col>
+      <el-col :span="6">
+        <el-form-item label="用户性别">
+          <el-input v-model="formSearch.gender" placeholder=""></el-input>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <div style="margin-top: 30px">
+          <el-button type="primary" @click="dialogVisible = true">新增</el-button>
+          <el-button type="primary" @click="getList()">搜索</el-button>
+        </div>
+      </el-col>
+    </el-row>
   </el-form>
+
+  <el-table v-loading="loading" :data="tableData" style="width: 100%">
+    <el-table-column prop="id" label="ID" width="180" />
+    <el-table-column prop="account" label="用户账号" width="180" />
+    <el-table-column prop="name" label="用户名称" width="180" />
+    <el-table-column prop="age" label="用户年龄" width="180" />
+    <el-table-column prop="status" label="用户状态" width="180" />
+    <el-table-column prop="gender" label="用户性别" width="180" />
+    <el-table-column prop="img" label="用户头像">
+      <template #default="scope">
+        <el-image style="width: 100px; height: 100px" :src="scope.row.img"></el-image>
+      </template>
+    </el-table-column>
+
+    <el-table-column prop="" label="操作">
+      <template #default="scope">
+        <el-button link :type="'primary'" @click="handleEdit(scope.row)">编辑</el-button>
+
+        <el-button link :type="'danger'" @click="handleDelete(scope.row)">删除</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+
+  <!--
+  https://p1.music.126.net/KkmOZTtSD9Cse5Cwf_9L3A==/109951170020022216.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
+  https://p1.music.126.net/zSIAXqiHU3Q_75yffPtLUA==/109951170884455051.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
+  https://p1.music.126.net/MvJMnAgamdI0R9aQXEJ9yw==/109951169632995337.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
+  -->
+  <el-pagination
+    v-model:current-page="currentPage4"
+    v-model:page-size="pageSize4"
+    :page-sizes="[100, 200, 300, 400]"
+    :size="size"
+    :disabled="disabled"
+    :background="background"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="400"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+  />
+
+  <el-dialog v-model="dialogVisible" title="新增" width="30%" :before-close="handleClose">
+    <el-form ref="form" :model="formall" label-width="80px" label-position="top">
+      <el-form-item label="名称">
+        <el-input v-model="formall.name" placeholder="请输入名称"></el-input>
+      </el-form-item>
+      <el-form-item label="年龄">
+        <el-input v-model="formall.age" placeholder="请输入年龄"></el-input>
+      </el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="formall.status" placeholder="请选择状态">
+          <el-option
+            v-for="item in statusOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="性别">
+        <el-select v-model="formall.gender" placeholder="请选择性别">
+          <el-option
+            v-for="item in genderOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="图片地址">
+        <el-input v-model="formall.img" :disabled="isEdit" placeholder="请输入图片地址"></el-input>
+      </el-form-item>
+    </el-form>
+
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="handleClose">取消</el-button>
+        <el-button type="primary" @click="handleAddRole">
+          {{ isEdit ? '编辑' : '新增' }}
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
-
-<script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import type { FormItemProps } from 'element-plus'
+<script lang="ts" setup>
 import axios from 'axios'
-const itemLabelPosition = ref<FormItemProps['labelPosition']>('')
-itemLabelPosition.value = 'top'
-const formLabelAlign = reactive({
-  Salary: '',
-  Gear: '',
-  year: '',
-})
-// const blobUrl = 'blob:orpheus://orpheus/63aaf9d1-571b-4c0e-b951-8e584834ff14'
-// fetch(blobUrl)
-//   .then((response) => response.blob())
-//   .then((blob) => {
-//     const imageUrl = URL.createObjectURL(blob)
-//     const img = document.createElement('img')
-//     img.src = imageUrl
-//     img.style.maxWidth = '100%'
-//     img.style.maxHeight = '100%'
-//     document.body.appendChild(img)
-//   })
-const resValue = ref(0)
-const handleCalculate = () => {
-  const { Salary, Gear, year } = formLabelAlign
-  if (!Salary || !Gear || !year) {
-    return ElMessage({
-      message: '请检查是否内容全部填写.',
-      type: 'warning',
-    })
-  }
+import { ref, onMounted, reactive } from 'vue'
+import type { ComponentSize } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+const currentPage4 = ref(4)
+const pageSize4 = ref(100)
+const size = ref<ComponentSize>('default')
+const background = ref(false)
+const disabled = ref(false)
 
-  const resAll = ((Number(Salary) + Number(Salary) * Number(Gear)) / 2) * Number(year) * 0.01
-  const person = (Number(Salary) * 0.08 * 12 * Number(year)) / 139
-  console.log(resAll, person)
-
-  resValue.value = Math.floor(resAll + person)
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val: number) => {
+  console.log(`current page: ${val}`)
 }
 
-const handleGetList = async () => {
-  await axios({
-    method: 'GET',
-    url: '/admin/api/user',
-  }).then((res) => {
-    console.log(res.data, '21312')
+const tableData = ref([])
+const dialogVisible = ref(false)
+const formSearch = reactive({
+  id: '',
+  age: '',
+  name: '',
+  status: '',
+  gender: '',
+})
+let formall = reactive({
+  name: '',
+  age: '',
+  status: '',
+  gender: '',
+  img: '',
+})
+const statusOptions = [
+  {
+    label: '正常',
+    value: '1',
+  },
+  {
+    label: '已经注册',
+    value: '2',
+  },
+  {
+    label: '未注册',
+    value: '3',
+  },
+  {
+    label: '禁用',
+    value: '0',
+  },
+]
+const genderOptions = [
+  {
+    label: '男',
+    value: 1,
+  },
+  {
+    label: '女',
+    value: 0,
+  },
+]
+
+onMounted(async () => {
+  await getList()
+})
+const pageAll = ref({
+  page: 1,
+  pageSize: 10,
+})
+
+const count = ref(0)
+// 获取数据
+const getList = async () => {
+  loading.value = true
+  await axios
+    .get('/admin/api/user', {
+      params: {
+        ...formSearch,
+        page: pageAll.value.page,
+        pageSize: pageAll.value.pageSize,
+      },
+    })
+    .then((res) => {
+      tableData.value = res.data.data.list
+      count.value = res.data.data.count
+      loading.value = false
+    })
+}
+
+const loading = ref(false)
+
+// 关闭
+const handleClose = () => {
+  Object.assign(formall, {
+    name: '',
+    age: '',
+    status: '',
+    gender: '',
+    img: '',
   })
+  dialogVisible.value = false
+  isEdit.value = false
+}
+
+// 新增
+const handleAddRole = () => {
+  axios
+    .post('/admin/api/user', {
+      name: formall.name,
+      age: formall.age,
+      status: formall.status,
+      gender: formall.gender,
+      img: formall.img,
+    })
+    .then(async (res) => {
+      console.log(res, '===231`312')
+
+      if (res.data.code === 200) {
+        dialogVisible.value = false
+        ElMessage({
+          message: '新增成功',
+          type: 'success',
+        })
+        await getList()
+      }
+    })
+}
+
+// 编辑
+interface RowType {
+  id: number
+  name: string
+  age: string
+  status: string
+  gender: string
+  img: string
+}
+const isEdit = ref(false)
+const handleEdit = (row: RowType) => {
+  isEdit.value = true
+  dialogVisible.value = true
+  formall = row
+}
+
+//  删除
+const handleDelete = (row: RowType) => {
+  ElMessageBox.confirm('确认删除吗？', 'Warning', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      axios.delete(`/admin/api/user/${row.id}`).then((res) => {
+        if (res.data.code === 200) {
+          ElMessage({
+            message: '删除成功',
+            type: 'success',
+          })
+          getList()
+        }
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
 }
 </script>
+
 <style scoped lang="scss"></style>
