@@ -54,11 +54,6 @@
     </el-table-column>
   </el-table>
 
-  <!--
-  https://p1.music.126.net/KkmOZTtSD9Cse5Cwf_9L3A==/109951170020022216.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
-  https://p1.music.126.net/zSIAXqiHU3Q_75yffPtLUA==/109951170884455051.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
-  https://p1.music.126.net/MvJMnAgamdI0R9aQXEJ9yw==/109951169632995337.jpg?imageView=&thumbnail=336y336&type=webp&rotate=0&tostatic=0
-  -->
   <el-pagination
     v-model:current-page="pageAll.page"
     v-model:page-size="pageAll.pageSize"
@@ -76,9 +71,9 @@
   <el-dialog v-model="dialogVisible" title="新增" width="30%" :before-close="handleClose">
     <el-form ref="form" :model="formall" label-width="80px" label-position="top">
       <el-form-item label="账号">
-        <el-input v-model="formall.account" placeholder="请输入名称"></el-input>
+        <el-input v-model="formall.account" :disabled="isEdit" placeholder="请输入名称"></el-input>
       </el-form-item>
-      <el-form-item label="密码">
+      <el-form-item label="密码" v-if="!isEdit">
         <el-input v-model="formall.password" placeholder="请输入名称"></el-input>
       </el-form-item>
       <el-form-item label="名称">
@@ -111,7 +106,11 @@
       </el-form-item>
 
       <el-form-item label="图片地址">
-        <el-input v-model="formall.img" :disabled="isEdit" placeholder="请输入图片地址"></el-input>
+        <el-input
+          v-model="formall.img"
+          :disabled="!!formall.img"
+          placeholder="请输入图片地址"
+        ></el-input>
       </el-form-item>
     </el-form>
 
@@ -374,18 +373,36 @@ const handleClose = () => {
 // 新增
 const handleAddRole = async () => {
   // 表单验证
-  if (!formall.value.account) {
-    ElMessage.error('请输入账号')
-    return
-  }
-  if (!formall.value.password) {
-    ElMessage.error('请输入密码')
-    return
-  }
-
   if (isEdit.value) {
+    axios
+      .put(`/admin/api/user/${formall.value.id}`, {
+        account: formall.value.account,
+        name: formall.value.name,
+        age: formall.value.age,
+        status: formall.value.status,
+        gender: formall.value.gender,
+        img: formall.value.img,
+      })
+      .then(async (res) => {
+        if (res.code === 200) {
+          dialogVisible.value = false
+          ElMessage({
+            message: '编辑成功',
+            type: 'success',
+          })
+          await getList()
+        }
+      })
     // 编辑
   } else {
+    if (!formall.value.account) {
+      ElMessage.error('请输入账号')
+      return
+    }
+    if (!formall.value.password) {
+      ElMessage.error('请输入密码')
+      return
+    }
     // 新增
     // 确保加密初始化完成
     const cryptoReady = await initCrypto()
